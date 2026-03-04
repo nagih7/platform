@@ -9,6 +9,11 @@ http:
       service: api@internal
       entryPoints: ["web"]
       middlewares: ["secure-headers"]
+    
+    proxmox-dashboard:
+      rule: "Host(`proxmox.{{ base_domain }}`)"
+      service: proxmox-service
+      entryPoints: ["web"]
       
     gitlab-route:
       rule: "Host(`gitlab.{{ base_domain }}`)"
@@ -33,6 +38,12 @@ http:
       entryPoints: ["web"]    
 
   services:
+    proxmox-service:
+      loadBalancer:
+        servers:
+          - url: "https://192.168.1.200:8006"
+        serversTransport: proxmoxTransport
+
     gitlab-service:
       loadBalancer:
         servers:
@@ -52,6 +63,10 @@ http:
       loadBalancer:
         servers:
           - url: "http://192.168.1.63:8002"
+
+  serversTransports:
+    proxmoxTransport:
+      insecureSkipVerify: true
 
   middlewares:
     secure-headers:
