@@ -1,0 +1,82 @@
+---
+- name: Cloudflare Tunnel Configuration
+  delegate_to: localhost
+  become: false
+  tags: k8s-tunnel
+  block:
+    - name: Create namespace for Cloudflare Tunnel
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Namespace
+          metadata:
+            name: cloudflare
+
+    - name: Migrate credentials.json to K8s Secret
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: tunnel-credentials
+            namespace: cloudflare
+          stringData:
+            credentials.json: "{{ lookup('file', 'tunnel-credentials.json') }}"
+
+    - name: Render config.yml.j2 to K8s ConfigMap
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: ConfigMap
+          metadata:
+            name: tunnel-config
+            namespace: cloudflare
+          data:
+            config.yml: "{{ lookup('template', 'cf-tunnel/config.yml.j2') }}"
+
+    - name: Deploy Cloudflared Pods
+      kubernetes.core.k8s:
+        state: present
+        definition: |
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            name: cloudflared
+            namespace: cloudflare
+          spec:
+            replicas: 2
+            selector:
+              matchLabels:
+                app: cloudflared
+            template:
+              metadata:
+                labels:
+                  app: cloudflared
+              spec:
+                containers:
+                - name: cloudflared
+                  image: cloudflare/cloudflared:latest
+                  args:
+                  - tunnel
+                  - --config
+                  - /etc/cloudflared/config.yml
+                  - run
+                  volumeMounts:
+                  - name: config-volume
+                    mountPath: /etc/cloudflared/config.yml
+                    subPath: config.yml
+                    readOnly: true
+                  - name: creds-volume
+                    mountPath: /etc/cloudflared/credentials.json
+                    subPath: credentials.json
+                    readOnly: true
+                volumes:
+                - name: config-volume
+                  configMap:
+                    name: tunnel-config
+                - name: creds-volume
+                  secret:
+                    secretName: tunnel-credentials

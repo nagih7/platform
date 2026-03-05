@@ -1,0 +1,82 @@
+---
+- name: Traefik Configuration
+  delegate_to: localhost
+  become: false
+  tags: k8s-traefik
+  block:
+    - name: Add Traefik Helm repository
+      kubernetes.core.helm_repository:
+        name: traefik
+        repo_url: https://traefik.github.io/charts
+
+    - name: Deploy Traefik Ingress Controller via Helm
+      kubernetes.core.helm:
+        name: traefik
+        chart_ref: traefik/traefik
+        release_namespace: traefik-system
+        create_namespace: yes
+        update_repo_cache: yes
+        wait: yes
+        values:
+          service:
+            type: LoadBalancer
+          ingressClass:
+            enabled: true
+            isDefaultClass: true
+            name: traefik
+          providers:
+            kubernetesCRD:
+              enabled: true
+            kubernetesIngress:
+              enabled: true
+          # Bật dashboard nội bộ để dễ debug (truy cập qua port-forward)
+          ingressRoute:
+            dashboard:
+              enabled: true
+
+    - name: Tạo Secret chứa Password cho Traefik Dashboard (admin:admin)
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: traefik-dashboard-auth
+            namespace: traefik-system
+          type: Opaque
+          stringData:
+            users: "{{ traefik_dashboard_user }}:{{ traefik_dashboard_pass }}"
+
+    - name: Tạo Middleware BasicAuth
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: traefik.io/v1alpha1
+          kind: Middleware
+          metadata:
+            name: dashboard-auth
+            namespace: traefik-system
+          spec:
+            basicAuth:
+              secret: traefik-dashboard-auth
+
+    - name: Tạo IngressRoute móc Dashboard ra ngoài
+      kubernetes.core.k8s:
+        state: present
+        definition: |
+          apiVersion: traefik.io/v1alpha1
+          kind: IngressRoute
+          metadata:
+            name: traefik-dashboard
+            namespace: traefik-system
+          spec:
+            entryPoints:
+              - web
+            routes:
+              - match: Host(`traefik.{{ base_domain }}`)
+                kind: Rule
+                services:
+                  - name: api@internal
+                    kind: TraefikService
+                middlewares:
+                  - name: dashboard-auth

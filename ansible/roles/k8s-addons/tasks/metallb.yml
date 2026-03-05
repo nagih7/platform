@@ -1,0 +1,50 @@
+---
+- name: Add MetalLB Helm repository
+  delegate_to: localhost
+  kubernetes.core.helm_repository:
+    name: metallb
+    repo_url: https://metallb.github.io/metallb
+
+- name: Deploy MetalLB via Helm
+  delegate_to: localhost
+  kubernetes.core.helm:
+    name: metallb
+    chart_ref: metallb/metallb
+    release_namespace: metallb-system
+    create_namespace: yes
+    update_repo_cache: yes
+    wait: yes
+
+- name: Đợi MetalLB Webhook khởi động hoàn tất
+  ansible.builtin.pause:
+    seconds: 15
+
+- name: Config IP LAN for MetalLB (IP Pool)
+  kubernetes.core.k8s:
+    state: present
+    definition: |
+      apiVersion: metallb.io/v1beta1
+      kind: IPAddressPool
+      metadata:
+        name: homelab-pool
+        namespace: metallb-system
+      spec:
+        addresses:
+        - 192.168.1.230-192.168.1.250
+  delegate_to: localhost
+  become: false
+
+- name: Cấu hình L2 Advertisement cho MetalLB
+  kubernetes.core.k8s:
+    state: present
+    definition: |
+      apiVersion: metallb.io/v1beta1
+      kind: L2Advertisement
+      metadata:
+        name: homelab-l2
+        namespace: metallb-system
+      spec:
+        ipAddressPools:
+        - homelab-pool
+  delegate_to: localhost
+  become: false
