@@ -11,9 +11,9 @@
 
     - name: Deploy Traefik Ingress Controller via Helm
       kubernetes.core.helm:
-        name: traefik
+        name: "{{ traefik_name }}"
         chart_ref: traefik/traefik
-        release_namespace: traefik-system
+        release_namespace: "{{ traefik_namespace }}"
         create_namespace: yes
         update_repo_cache: yes
         wait: yes
@@ -40,8 +40,8 @@
           apiVersion: v1
           kind: Secret
           metadata:
-            name: traefik-dashboard-auth
-            namespace: traefik-system
+            name: "{{ traefik_dashboard_secret }}"
+            namespace: "{{ traefik_namespace }}"
           type: Opaque
           stringData:
             users: "{{ traefik_dashboard_user }}:{{ traefik_dashboard_pass }}"
@@ -53,11 +53,11 @@
           apiVersion: traefik.io/v1alpha1
           kind: Middleware
           metadata:
-            name: dashboard-auth
-            namespace: traefik-system
+            name: "{{ traefik_dashboard_middleware }}"
+            namespace: "{{ traefik_namespace }}"
           spec:
             basicAuth:
-              secret: traefik-dashboard-auth
+              secret: "{{ traefik_dashboard_secret }}"
 
     - name: Create IngressRoute and hook the Dashboard outwards
       kubernetes.core.k8s:
@@ -67,7 +67,7 @@
           kind: IngressRoute
           metadata:
             name: traefik-dashboard
-            namespace: traefik-system
+            namespace: {{ traefik_namespace }}
           spec:
             entryPoints:
               - web
@@ -78,4 +78,4 @@
                   - name: api@internal
                     kind: TraefikService
                 middlewares:
-                  - name: dashboard-auth
+                  - name: {{ traefik_dashboard_middleware }}

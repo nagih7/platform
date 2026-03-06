@@ -1,0 +1,24 @@
+---
+# Tunnel
+tunnel_name: tunnel
+tunnel_container: cloudflared-tunnel
+tunnel_version: latest
+tunnel_image: cloudflare/cloudflared:{{ tunnel_version }}
+tunnel_replicas: 2
+tunnel_config_dir: /etc/cloudflared/config.yml
+tunnel_credentials_dir: /etc/cloudflared/credentials.json
+tunnel_namespace: cloudflare
+tunnel_credentials_secret: tunnel-credentials
+tunnel_config: tunnel-config
+tunnel_label: cloudflared
+
+# Traefik
+traefik_name: traefik
+traefik_container: traefik
+traefik_version: latest
+traefik_image: traefik:{{ traefik_version }}
+traefik_replicas: 2
+traefik_config_dir: /etc/traefik
+traefik_namespace: traefik-system
+traefik_dashboard_middleware: dashboard-auth
+traefik_dashboard_secret: traefik-dashboard-auth

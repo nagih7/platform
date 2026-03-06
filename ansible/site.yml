@@ -4,19 +4,10 @@
   roles:
     - { role: bootstrap, tags: bootstrap }
 
-- hosts: reverse-proxy, minecraft-server
-  become: true
-  roles:
-    - { role: docker, tags: docker }
-
-- hosts: reverse-proxy
-  become: true
-  roles:
-    - { role: proxy, tags: proxy }
-
 - hosts: minecraft-server
   become: true
   roles:
+    - { role: docker, tags: docker }
     - { role: backup, tags: backup }
     - { role: minecraft, tags: minecraft }
 

@@ -1,11 +1,12 @@
 ---
 - name: MetalLB Configuration
   include_tasks: metallb.yml
-
-- name: Traefik Configuration
-  include_tasks: traefik.yml
-  tags: k8s-traefik
+  tags: k8s-metallb
 
 - name: Cloudflare Tunnel Configuration
   include_tasks: cf_tunnel.yml
   tags: k8s-tunnel
+
+- name: Traefik Configuration
+  include_tasks: traefik.yml
+  tags: k8s-traefik
