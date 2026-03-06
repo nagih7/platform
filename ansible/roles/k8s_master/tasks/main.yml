@@ -24,17 +24,24 @@
       args:
         creates: /etc/rancher/k3s/k3s.yaml
 
-    - name: Read Token to join Worker
-      ansible.builtin.slurp:
-        src: /var/lib/rancher/k3s/server/node-token
-      register: node_token
+- name: Read Token to join Worker
+  ansible.builtin.slurp:
+    src: /var/lib/rancher/k3s/server/node-token
+  register: node_token
 
-    - name: Save Token to Global variable
-      ansible.builtin.set_fact:
-        k3s_token: "{{ node_token['content'] | b64decode | trim }}"
+- name: Save Token to Global Variable
+  ansible.builtin.set_fact:
+    k3s_token: "{{ node_token['content'] | b64decode | trim }}"
 
-    - name: Pull Kubeconfig file to local
-      ansible.builtin.fetch:
-        src: /etc/rancher/k3s/k3s.yaml
-        dest: ~/.kube/config_homelab
-        flat: yes
+- name: Check if local Kubeconfig exists
+  ansible.builtin.stat:
+    path: ~/.kube/config_homelab
+  register: local_kubeconfig
+  delegate_to: localhost
+
+- name: Pull Kubeconfig to local
+  ansible.builtin.fetch:
+    src: /etc/rancher/k3s/k3s.yaml
+    dest: ~/.kube/config_homelab
+    flat: yes
+  when: not local_kubeconfig.stat.exists

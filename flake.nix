@@ -25,10 +25,9 @@
           pythonEnv
         ];
         
-        # Ép Ansible dùng đúng cái Python môi trường này
         shellHook = ''
           export ANSIBLE_PYTHON_INTERPRETER="${pythonEnv}/bin/python3"
-          echo "🚀 Môi trường Homelab IaC đã sẵn sàng!"
+          echo "Homelab IaC environment is ready!"
         '';
       };
     };
