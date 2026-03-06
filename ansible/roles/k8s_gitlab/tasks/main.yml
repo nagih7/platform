@@ -200,3 +200,7 @@
                     port: 80
                 middlewares:
                   - name: secure-headers
+
+- name: Gitlab Runner Configuration
+  include_tasks: gitlab-runner.yml
+  tags: k8s-runner
