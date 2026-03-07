@@ -192,3 +192,34 @@ virtual_machines:
       username: "david"
       keys:
         - "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPm/jank+if691bXnVDX3shVAo/whFvBBb+GJdyAt5+t datlht3@fpt.com"
+
+  kiendt:
+    id: 605
+    name: "kiendt"
+    node: "nagih"
+    scsi_hardware: "virtio-scsi-single"
+
+    template_id: 9000
+
+    cpu: 1
+    memory: 2048
+    disks:
+      - datastore_id: "local-lvm"
+        interface: "scsi0"
+        size: 30
+        file_format: "raw"
+        discard: "on"
+        ssd: true
+
+    dns:
+      - "8.8.8.8"
+      - "1.1.1.1"
+
+    ip_config:
+      address: "192.168.1.65/24"
+      gateway: "192.168.1.1"
+
+    user:
+      username: "kiendt"
+      keys:
+        - "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPKl+/2WQIcidE3bMa0byEY/49UjA9ufI3+ybWhl5FiT admin@DESKTOP-PRQ4TMA"
