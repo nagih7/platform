@@ -3,5 +3,5 @@ ansible_python_interpreter: /usr/bin/python3
 docker_users:
   - "nagih"
 
-ssd_mount_path: /mnt/data
+ssd_mount_path: /mnt/disks
 hdd_mount_path: /mnt/hdd

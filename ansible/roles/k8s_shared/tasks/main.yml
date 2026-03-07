@@ -1,7 +1,15 @@
 ---
-- name: Storage Configuration
-  include_tasks: storage.yml
-  tags: k8s-storage
+- name: Shared Service Bootstrap
+  include_tasks: bootstrap.yml
+  tags: k8s-shared
+
+- name: Postgres Configuration
+  include_tasks: postgres.yml
+  tags: k8s-postgres
+
+- name: Redis Configuration
+  include_tasks: redis.yml
+  tags: k8s-redis
 
 - name: Cloudflare DDNS Configuration
   include_tasks: cf-ddns.yml

@@ -1,0 +1,28 @@
+---
+- name: Deploy Shared Data Services (Postgres & Redis)
+  delegate_to: localhost
+  become: false
+  tags: k8s-storage
+  block:
+    - name: Create shared-services namespace
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Namespace
+          metadata:
+            name: "{{ shared_services_namespace }}"
+
+    - name: Deploy Shared Secrets
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: shared-db-secrets
+            namespace: shared-services
+          type: Opaque
+          stringData:
+            postgres-password: "{{ postgres_root_password }}"
+            redis-password: "{{ redis_password }}"

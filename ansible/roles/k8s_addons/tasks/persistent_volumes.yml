@@ -11,14 +11,14 @@
           apiVersion: v1
           kind: PersistentVolume
           metadata:
-            name: "{{ item.name }}-pv"
+            name: "{{ item.name }}"
           spec:
             capacity:
               storage: "{{ item.storage }}"
             accessModes: [ReadWriteOnce]
             persistentVolumeReclaimPolicy: "{{ item.policy }}"
             storageClassName: "{{ item.class }}"
-            "{{ item.type }}":
+            local:
               path: "{{ item.path }}"
             nodeAffinity:
               required:

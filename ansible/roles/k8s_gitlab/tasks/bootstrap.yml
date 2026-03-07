@@ -12,52 +12,6 @@
           metadata:
             name: "{{ gitlab_namespace }}"
 
-    - name: Deploy Persistent Volumes (hostPath for legacy data)
-      kubernetes.core.k8s:
-        state: present
-        definition: |
-          apiVersion: v1
-          kind: PersistentVolume
-          metadata:
-            name: gitlab-data-pv
-          spec:
-            capacity:
-              storage: 50Gi
-            accessModes: [ReadWriteOnce]
-            persistentVolumeReclaimPolicy: Retain
-            storageClassName: local-path
-            hostPath:
-              path: "/mnt/data/gitlab/data"
-            nodeAffinity:
-              required:
-                nodeSelectorTerms:
-                - matchExpressions:
-                  - key: kubernetes.io/hostname
-                    operator: In
-                    values:
-                    - k8s-worker-1
-          ---
-          apiVersion: v1
-          kind: PersistentVolume
-          metadata:
-            name: gitlab-config-pv
-          spec:
-            capacity:
-              storage: 2Gi
-            accessModes: [ReadWriteOnce]
-            persistentVolumeReclaimPolicy: Retain
-            storageClassName: local-path
-            hostPath:
-              path: "/mnt/data/gitlab/config"
-            nodeAffinity:
-              required:
-                nodeSelectorTerms:
-                - matchExpressions:
-                  - key: kubernetes.io/hostname
-                    operator: In
-                    values:
-                    - k8s-worker-1
-
     - name: Deploy Persistent Volume Claims
       kubernetes.core.k8s:
         state: present
@@ -66,24 +20,25 @@
           kind: PersistentVolumeClaim
           metadata:
             name: gitlab-data-pvc
-            namespace: gitlab
+            namespace: {{ gitlab_namespace }}
           spec:
-            accessModes: [ReadWriteOnce]
             storageClassName: local-path
+            accessModes: [ReadWriteOnce]
             resources:
               requests:
-                storage: 50Gi
-            volumeName: gitlab-data-pv
+                storage: "{{ gitlab_data_storage }}"
+            volumeName: "{{ gitlab_data_pv }}"
+
           ---
           apiVersion: v1
           kind: PersistentVolumeClaim
           metadata:
             name: gitlab-config-pvc
-            namespace: gitlab
+            namespace: "{{ gitlab_namespace }}"
           spec:
-            accessModes: [ReadWriteOnce]
             storageClassName: local-path
+            accessModes: [ReadWriteOnce]
             resources:
               requests:
-                storage: 2Gi
-            volumeName: gitlab-config-pv
+                storage: "{{ gitlab_config_storage }}"
+            volumeName: "{{ gitlab_config_pv }}"
