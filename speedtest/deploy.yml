@@ -1,0 +1,97 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: speedtest
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: speedtest-tracker-pvc
+  namespace: speedtest
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 2Gi
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: speedtest-tracker
+  namespace: speedtest
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate # Đảm bảo tắt hẳn con cũ rồi mới bật con mới để ko kẹt ổ cứng
+  selector:
+    matchLabels:
+      app: speedtest-tracker
+  template:
+    metadata:
+      labels:
+        app: speedtest-tracker
+    spec:
+      containers:
+        - name: speedtest-tracker
+          image: lscr.io/linuxserver/speedtest-tracker:latest
+          env:
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "1000"
+            - name: TZ
+              value: "Asia/Ho_Chi_Minh"
+            - name: APP_KEY
+              value: "base64:yD1zK/qC7R4lH9eN3xP8jA5vM2fT6rW0bU4cE7oQ9iI="
+            - name: APP_URL
+              value: "https://speedtest.nooblearn2code.com"
+          ports:
+            - containerPort: 80
+          volumeMount:
+            - name: config
+              mountPath: /config
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "50m"
+            limits:
+              memory: "512Mi"
+              cpu: "1000m"
+      volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: speedtest-tracker-pvc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: speedtest-tracker-service
+  namespace: speedtest
+spec:
+  selector:
+    app: speedtest-tracker
+  ports:
+    - port: 80
+      targetPort: 80
+
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: speedtest-ingress
+  namespace: speedtest
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`speedtest.nooblearn2code.com`)
+      kind: Rule
+      services:
+        - name: speedtest-tracker-service
+          port: 80
