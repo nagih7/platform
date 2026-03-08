@@ -1,5 +1,8 @@
-backup_disk_device: sda
-backup_dir: /mnt/hdd-backup
+mount_enabled: true
+mount_points:
+  - path: "/mnt/hdd-backup"
+    src: "/dev/sda"
+    fstype: "ext4"
 
 minecraft_container_version: "latest"
 minecraft_container: minecraft-server

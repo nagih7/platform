@@ -1,0 +1,54 @@
+---
+# Postgres
+postgres_node: "k8s-worker-1"
+postgres_mount_path: "{{ ssd_mount_path }}/postgres"
+postgres_pv: postgres-pv
+postgres_storage: 20Gi
+
+# Gitlab
+gitlab_config_mount_path: "{{ ssd_mount_path }}/gitlab/config"
+gitlab_data_mount_path: "{{ ssd_mount_path }}/gitlab/data"
+gitlab_config_pv: gitlab-config-pv
+gitlab_data_pv: gitlab-data-pv
+gitlab_config_storage: 2Gi
+gitlab_data_storage: 20Gi
+
+# Seafile
+seafile_mount_path: "{{ hdd_mount_path }}/seafile"
+seafile_pv: seafile-pv
+seafile_storage: 100Gi
+
+# Persistent Volumes
+persistent_volumes:
+  - {
+      name: "{{ postgres_pv }}",
+      storage: "{{ postgres_storage }}",
+      policy: "Retain",
+      class: "local-path",
+      path: "{{ postgres_mount_path }}",
+      node: "k8s-worker-1",
+    }
+  - {
+      name: "{{ gitlab_config_pv }}",
+      storage: "{{ gitlab_config_storage }}",
+      policy: "Retain",
+      class: "local-path",
+      path: "{{ gitlab_config_mount_path }}",
+      node: "k8s-worker-1",
+    }
+  - {
+      name: "{{ gitlab_data_pv }}",
+      storage: "{{ gitlab_data_storage }}",
+      policy: "Retain",
+      class: "local-path",
+      path: "{{ gitlab_data_mount_path }}",
+      node: "k8s-worker-1",
+    }
+  - {
+      name: "{{ seafile_pv }}",
+      storage: "{{ seafile_storage }}",
+      policy: "Retain",
+      class: "local-path",
+      path: "{{ seafile_mount_path }}",
+      node: "k8s-worker-1",
+    }

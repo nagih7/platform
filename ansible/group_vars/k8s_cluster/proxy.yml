@@ -14,6 +14,11 @@ tunnel_label: cloudflared
 
 # Cloudflare DDNS
 ddns_worker_hostname: k8s-worker-1
+cloudflare_ddns_version: "latest"
+cloudflare_ddns_image: "oznu/cloudflare-ddns:{{ cloudflare_ddns_version }}"
+cloudflare_ddns_container: cloudflare-ddns
+cloudflare_ddns_zone: "{{ base_domain }}"
+cloudflare_ddns_subdomain: "gateway"
 
 # Traefik
 traefik_name: traefik

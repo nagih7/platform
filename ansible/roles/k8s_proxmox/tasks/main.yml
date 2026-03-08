@@ -23,7 +23,7 @@
             namespace: "{{ proxmox_namespace }}"
           spec:
             ports:
-              - name: https-web # Đặt tên rõ ràng cho port
+              - name: https-web
                 protocol: TCP
                 port: "{{ proxmox_dashboard_port | int }}"
                 targetPort: "{{ proxmox_dashboard_port | int }}"
@@ -41,7 +41,7 @@
             - addresses:
                 - ip: "{{ proxmox_ip }}"
               ports:
-                - name: https-web # Phải khớp với tên port ở Service
+                - name: https-web
                   port: "{{ proxmox_dashboard_port | int }}"
 
     - name: 4. Deploy Traefik Configuration for Proxmox
@@ -69,6 +69,6 @@
                   kind: Rule
                   services:
                     - name: proxmox-external-service
-                      port: https-web # Gọi thẳng bằng TÊN port thay vì số
-                      scheme: https # BẮT BUỘC ĐỂ ÉP TRAEFIK GỌI SANG PROXMOX BẰNG HTTPS
+                      port: https-web
+                      scheme: https
                       serversTransport: proxmox-transport

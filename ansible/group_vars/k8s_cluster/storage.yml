@@ -1,23 +1,7 @@
 ---
-# ========== POSTGRES ========== #
-postgres_root_user: "noob"
-postgres_root_password: "01001110"
 postgres_port: 5432
+redis_port: 6379
 postgres_node: k8s-worker-1
-
-# Gitlab
-gitlab_runner_token: glrt-ByuiPxE5MCSuSxLxxgy5
-gitlab_namespace: gitlab
-
-# Namespaces
-shared_services_namespace: shared-services
-microservices_namespace: microservices
-seafile_namespace: seafile
-
-namespaces:
-  - "{{ shared_services_namespace }}"
-  - "{{ microservices_namespace }}"
-  - "{{ seafile_namespace }}"
 
 databases:
   - {
@@ -62,7 +46,3 @@ databases:
       password: "seafile_db_pass",
       namespace: "{{ seafile_namespace }}",
     }
-
-# ========== REDIS ========== #
-redis_root_password: "01001110"
-redis_port: 6379
