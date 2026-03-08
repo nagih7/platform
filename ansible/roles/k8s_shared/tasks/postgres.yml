@@ -129,8 +129,7 @@
         login_user: "{{ postgres_root_user }}"
         login_password: "{{ postgres_root_password }}"
         state: present
-      loop: "{{ postgres_databases }}"
-      tags: database
+      loop: "{{ databases }}"
 
     - name: Create PostgreSQL Databases
       community.postgresql.postgresql_db:
@@ -141,5 +140,4 @@
         login_user: "{{ postgres_root_user }}"
         login_password: "{{ postgres_root_password }}"
         state: present
-      loop: "{{ postgres_databases }}"
-      tags: database
+      loop: "{{ databases }}"

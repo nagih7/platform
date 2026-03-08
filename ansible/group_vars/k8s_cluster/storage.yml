@@ -1,33 +1,68 @@
 ---
 # ========== POSTGRES ========== #
 postgres_root_user: "noob"
-postgres_root_password: "nooblearn2code_postgres_pass"
+postgres_root_password: "01001110"
 postgres_port: 5432
 postgres_node: k8s-worker-1
 
-# Databases
-postgres_databases:
-  - { name: "gitlab", user: "gitlab", password: "gitlab_db_pass" }
-  - { name: "esl", user: "esl", password: "esl_db_pass" }
+# Gitlab
+gitlab_runner_token: glrt-ByuiPxE5MCSuSxLxxgy5
+gitlab_namespace: gitlab
+
+# Namespaces
+shared_services_namespace: shared-services
+microservices_namespace: microservices
+seafile_namespace: seafile
+
+namespaces:
+  - "{{ shared_services_namespace }}"
+  - "{{ microservices_namespace }}"
+  - "{{ seafile_namespace }}"
+
+databases:
   - {
-      name: "auth-service",
+      name: "gitlab",
+      user: "gitlab",
+      password: "gitlab_db_pass",
+      namespace: "{{ gitlab_namespace }}",
+    }
+  - {
+      name: "auth",
       user: "auth",
-      password: "nooblearn2code_database_password",
+      password: "auth_db_pass",
+      namespace: "{{ microservices_namespace }}",
     }
   - {
-      name: "blog-service",
+      name: "blog",
       user: "blog",
-      password: "nooblearn2code_database_password",
+      password: "blog_db_pass",
+      namespace: "{{ microservices_namespace }}",
     }
   - {
-      name: "uniquizz-service",
+      name: "uniquizz",
       user: "uniquizz",
-      password: "nooblearn2code_database_password",
+      password: "uniquizz_db_pass",
+      namespace: "{{ microservices_namespace }}",
     }
-  - { name: "resumind-service", user: "resumind", password: "hoanggxyuuki" }
-  - { name: "lunar-service", user: "lunar", password: "hoanggxyuuki" }
-  - { name: "seafile", user: "seafile", password: "seafile_db_pass" }
+  - {
+      name: "resumind",
+      user: "resumind",
+      password: "hoanggxyuuki",
+      namespace: "{{ microservices_namespace }}",
+    }
+  - {
+      name: "lunar",
+      user: "lunar",
+      password: "hoanggxyuuki",
+      namespace: "{{ microservices_namespace }}",
+    }
+  - {
+      name: "seafile",
+      user: "seafile",
+      password: "seafile_db_pass",
+      namespace: "{{ seafile_namespace }}",
+    }
 
 # ========== REDIS ========== #
-redis_password: "nooblearn2code_redis_pass"
+redis_root_password: "01001110"
 redis_port: 6379

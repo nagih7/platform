@@ -8,8 +8,6 @@ cloudflare_ddns_container: cloudflare-ddns
 cloudflare_ddns_zone: "{{ base_domain }}"
 cloudflare_ddns_subdomain: "gateway"
 
-shared_services_namespace: shared-services
-
 # Postgres
 postgres_node: "k8s-worker-1"
 postgres_mount_path: "{{ ssd_mount_path }}/postgres"
@@ -27,6 +25,7 @@ gitlab_data_storage: 20Gi
 # Seafile
 seafile_mount_path: "{{ hdd_mount_path }}/seafile"
 seafile_pv: seafile-pv
+seafile_storage: 100Gi
 
 # Persistent Volumes
 persistent_volumes: # <name>-pv
@@ -56,7 +55,7 @@ persistent_volumes: # <name>-pv
     }
   - {
       name: "{{ seafile_pv }}",
-      storage: "100Gi",
+      storage: "{{ seafile_storage }}",
       policy: "Retain",
       class: "local-path",
       path: "{{ seafile_mount_path }}",
