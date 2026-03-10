@@ -1,0 +1,28 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: infrastructure
+  namespace: argocd
+spec:
+  generators:
+    - git:
+        repoURL: "https://github.com/nagih7/platform.git"
+        revision: main
+        directories:
+          - path: gitops/infrastructure/*
+  template:
+    metadata:
+      name: "{{path.basename}}"
+    spec:
+      project: default
+      source:
+        repoURL: "https://github.com/nagih7/platform.git"
+        targetRevision: main
+        path: "{{path}}"
+      destination:
+        server: "https://kubernetes.default.svc"
+        namespace: "argocd"
+      syncPolicy:
+        automated:
+          prune: false
+          selfHeal: true

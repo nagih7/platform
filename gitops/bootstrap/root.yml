@@ -1,20 +1,23 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: auth-service
+  name: root
   namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
   source:
-    repoURL: "https://github.com/nagih7/homelab-gitops.git"
+    repoURL: "https://github.com/nagih7/platform.git"
     targetRevision: main
-    path: microservices/auth-service
+    path: gitops/bootstrap
+    directory:
+      recurse: false
+      exclude: "root.yml"
   destination:
     server: "https://kubernetes.default.svc"
-    namespace: microservices
+    namespace: argocd
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
-    syncOptions:
-      - CreateNamespace=true
