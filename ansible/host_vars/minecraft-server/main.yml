@@ -1,7 +1,7 @@
 mount_enabled: true
 mount_points:
   - path: "/mnt/hdd-backup"
-    src: "/dev/sda"
+    src: "/dev/sdb"
     fstype: "ext4"
 
 minecraft_container_version: "latest"

@@ -4,22 +4,13 @@
   delegate_to: localhost
   tags: k8s-argocd
   block:
-    - name: 1. Create ArgoCD namespace
-      kubernetes.core.k8s:
-        state: present
-        definition:
-          apiVersion: v1
-          kind: Namespace
-          metadata:
-            name: argocd
-
-    - name: 2. Install ArgoCD Official Manifests
+    - name: 1. Install ArgoCD Official Manifests
       kubernetes.core.k8s:
         state: present
         namespace: argocd
         src: https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 
-    - name: 3. Create ServersTransport for ArgoCD
+    - name: 2. Create ServersTransport for ArgoCD
       kubernetes.core.k8s:
         state: present
         definition:
@@ -31,7 +22,7 @@
           spec:
             insecureSkipVerify: true
 
-    - name: 4. Create IngressRoute for ArgoCD UI
+    - name: 3. Create IngressRoute for ArgoCD UI
       kubernetes.core.k8s:
         state: present
         definition:

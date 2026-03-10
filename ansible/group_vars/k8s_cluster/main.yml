@@ -5,10 +5,14 @@ base_domain: nooblearn2code.com
 proxmox_namespace: proxmox
 shared_services_namespace: shared-services
 microservices_namespace: microservices
+argocd_namespace: argocd
 gitlab_namespace: gitlab
 seafile_namespace: seafile
 
 namespaces:
+  - "{{ proxmox_namespace }}"
   - "{{ shared_services_namespace }}"
   - "{{ microservices_namespace }}"
+  - "{{ argocd_namespace }}"
+  - "{{ gitlab_namespace }}"
   - "{{ seafile_namespace }}"

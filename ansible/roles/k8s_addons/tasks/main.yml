@@ -1,20 +1,16 @@
 ---
-- name: Create Persistent Volumes
-  include_tasks: persistent_volumes.yml
-  tags: k8s-pv
+- name: Prerequisite
+  include_tasks: prerequisite/main.yml
+  tags: k8s-addons-pre
 
-- name: MetalLB Configuration
-  include_tasks: metallb.yml
-  tags: k8s-metallb
+- name: Proxy Configuration
+  include_tasks: proxy/main.yml
+  tags: k8s-proxy
 
-- name: Cloudflare Tunnel Configuration
-  include_tasks: cf_tunnel.yml
-  tags: k8s-tunnel
+- name: Proxmox Configuration
+  include_tasks: proxmox.yml
+  tags: k8s-proxmox
 
-- name: Traefik Configuration
-  include_tasks: traefik.yml
-  tags: k8s-traefik
-
-- name: ArgoCD Configuration
-  include_tasks: argocd.yml
-  tags: k8s-argocd
+- name: Shared Services Configuration
+  include_tasks: shared_services/main.yml
+  tags: k8s-shared

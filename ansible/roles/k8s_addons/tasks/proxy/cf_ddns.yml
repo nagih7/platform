@@ -2,7 +2,7 @@
 - name: Deploy Cloudflare DDNS on K8s
   delegate_to: localhost
   become: false
-  tags: k8s-cf-ddns
+  tags: k8s-ddns
   block:
     - name: Create Cloudflare DDNS Secret for API Key
       kubernetes.core.k8s:

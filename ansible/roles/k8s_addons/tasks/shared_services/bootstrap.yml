@@ -4,16 +4,6 @@
   become: false
   tags: k8s-shared-bootstrap
   block:
-    - name: Create namespaces
-      kubernetes.core.k8s:
-        state: present
-        definition:
-          apiVersion: v1
-          kind: Namespace
-          metadata:
-            name: "{{ item }}"
-      loop: "{{ namespaces }}"
-
     - name: Deploy Root Shared Secrets
       kubernetes.core.k8s:
         state: present
@@ -25,8 +15,8 @@
             namespace: "{{ shared_services_namespace }}"
           type: Opaque
           stringData:
-            postgres-password: "{{ postgres_root_password }}"
-            redis-password: "{{ redis_root_password }}"
+            postgres-password: "{{ postgres_root_password | string }}"
+            redis-password: "{{ redis_root_password | string }}"
 
     - name: Deploy Shared DB Credentials Secret
       kubernetes.core.k8s:

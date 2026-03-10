@@ -10,7 +10,3 @@
 - name: Redis Configuration
   include_tasks: redis.yml
   tags: k8s-redis
-
-- name: Cloudflare DDNS Configuration
-  include_tasks: cf-ddns.yml
-  tags: k8s-cf-ddns

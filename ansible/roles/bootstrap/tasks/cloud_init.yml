@@ -1,0 +1,31 @@
+- name: OS Configuration - Disable Cloud-Init and Fix DNS
+  become: true
+  block:
+    - name: Disable cloud-init permanently to prevent config reset on reboot
+      ansible.builtin.file:
+        path: /etc/cloud/cloud-init.disabled
+        state: touch
+        mode: "0644"
+
+    - name: Ensure systemd-resolved is installed (Handling minimal images)
+      apt:
+        name: systemd-resolved
+        state: present
+
+    - name: Force systemd-resolved to use Google & Cloudflare DNS (Primary)
+      ansible.builtin.lineinfile:
+        path: /etc/systemd/resolved.conf
+        regexp: "^#?DNS="
+        line: "DNS=8.8.8.8 1.1.1.1"
+
+    - name: Force systemd-resolved to use Fallback DNS
+      ansible.builtin.lineinfile:
+        path: /etc/systemd/resolved.conf
+        regexp: "^#?FallbackDNS="
+        line: "FallbackDNS=8.8.4.4 1.0.0.1"
+
+    - name: Apply and restart systemd-resolved service
+      ansible.builtin.systemd:
+        name: systemd-resolved
+        state: restarted
+        enabled: yes

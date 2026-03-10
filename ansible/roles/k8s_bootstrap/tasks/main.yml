@@ -1,31 +1,4 @@
-- name: Tailscale Configuration
-  become: true
-  tags: k8s-tailscale
-  block:
-    - name: Add Tailscale GPG key
-      ansible.builtin.get_url:
-        url: https://pkgs.tailscale.com/stable/debian/bookworm.noarmor.gpg
-        dest: /usr/share/keyrings/tailscale-archive-keyring.gpg
-        mode: "0644"
-
-    - name: Add Tailscale Repo (Debian 12)
-      ansible.builtin.apt_repository:
-        repo: "deb [signed-by=/usr/share/keyrings/tailscale-archive-keyring.gpg] https://pkgs.tailscale.com/stable/debian bookworm main"
-        state: present
-        filename: tailscale
-
-    - name: Install Tailscale package
-      ansible.builtin.apt:
-        name: tailscale
-        state: present
-        update_cache: yes
-
-    - name: Check login status
-      ansible.builtin.command: tailscale status
-      register: ts_status
-      changed_when: false
-      failed_when: false
-
-    - name: Join Tailscale network (Non-interactive)
-      ansible.builtin.command: "tailscale up --authkey={{ tailscale_authkey }} --ssh"
-      when: "'Logged out' in ts_status.stdout or 'not running' in ts_status.stdout"
+---
+- name: MetalLB Configuration
+  include_tasks: metallb.yml
+  tags: k8s-metallb

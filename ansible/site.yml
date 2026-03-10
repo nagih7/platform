@@ -1,7 +1,7 @@
 ---
 - hosts: all
   become: true
-  roles: { role: bootstrap, tags: bootstrap }
+  roles: [{ role: bootstrap, tags: bootstrap }]
 
 - hosts: minecraft-server
   become: true
@@ -12,23 +12,21 @@
 - name: Setup K8s Cluster
   hosts: k8s_cluster
   tags: k8s-cluster
-  roles: { role: k8s_bootstrap, tags: k8s-bootstrap }
+  roles: [{ role: k8s_prerequisite, tags: k8s-pre }]
 
 - name: Setup K3s Control Plane
   hosts: k8s_master
   tags: k8s-cluster
-  roles: { role: k8s_master, tags: k8s-master }
+  roles: [{ role: k8s_master, tags: k8s-master }]
 
 - name: Setup K3s Workers
   hosts: k8s_worker
   tags: k8s-cluster
-  roles: { role: k8s_worker, tags: k8s-worker }
+  roles: [{ role: k8s_worker, tags: k8s-worker }]
 
 - name: Deploy Services to K8s
   hosts: k8s_master
   tags: k8s-deploy
   roles:
-    - { role: k8s_proxmox, tags: k8s-proxmox }
+    - { role: k8s_bootstrap, tags: k8s-bootstrap }
     - { role: k8s_addons, tags: k8s-addons }
-    - { role: k8s_shared, tags: k8s-shared }
-    - { role: k8s_gitlab, tags: k8s-gitlab }
