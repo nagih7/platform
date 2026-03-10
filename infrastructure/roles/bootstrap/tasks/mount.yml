@@ -1,0 +1,29 @@
+- name: Format disk
+  community.general.filesystem:
+    fstype: "{{ item.fstype }}"
+    dev: "{{ item.src }}"
+    force: no
+  loop: "{{ mount_points }}"
+
+- name: Get disk UUIDs
+  command: "blkid -s UUID -o value {{ item.src }}"
+  loop: "{{ mount_points }}"
+  register: hdd_uuids
+  changed_when: false
+
+- name: Unsure mount directory existed
+  file:
+    path: "{{ item.path }}"
+    state: directory
+    mode: "0755"
+  loop: "{{ mount_points }}"
+
+- name: Mount HDD by UUID
+  mount:
+    path: "{{ item.item.path }}"
+    src: "UUID={{ item.stdout }}"
+    fstype: "{{ item.item.fstype }}"
+    opts: defaults,nofail
+    state: mounted
+  loop: "{{ hdd_uuids.results }}"
+  when: item.stdout != ""

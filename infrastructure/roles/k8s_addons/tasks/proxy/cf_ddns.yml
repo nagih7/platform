@@ -1,0 +1,63 @@
+---
+- name: Deploy Cloudflare DDNS on K8s
+  delegate_to: localhost
+  become: false
+  tags: k8s-ddns
+  block:
+    - name: Create Cloudflare DDNS Secret for API Key
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: cf-ddns-secret
+            namespace: default
+          type: Opaque
+          stringData:
+            api-key: "{{ cloudflare_ddns_api_key }}"
+
+    - name: Deploy Cloudflare DDNS Deployment
+      kubernetes.core.k8s:
+        state: present
+        definition: |
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            name: cloudflare-ddns
+            namespace: default
+          spec:
+            replicas: 1
+            selector:
+              matchLabels:
+                app: cloudflare-ddns
+            template:
+              metadata:
+                labels:
+                  app: cloudflare-ddns
+              spec:
+                nodeSelector:
+                  kubernetes.io/hostname: {{ ddns_worker_hostname }}
+                containers:
+                - name: {{ cloudflare_ddns_container }}
+                  image: {{ cloudflare_ddns_image }}
+                  imagePullPolicy: IfNotPresent
+                  env:
+                  - name: API_KEY
+                    valueFrom:
+                      secretKeyRef:
+                        name: cf-ddns-secret
+                        key: api-key
+                  - name: ZONE
+                    value: "{{ cloudflare_ddns_zone }}"
+                  - name: SUBDOMAIN
+                    value: "{{ cloudflare_ddns_subdomain }}"
+                  - name: PROXIED
+                    value: "false"
+                  resources:
+                    limits:
+                      memory: "64Mi"
+                      cpu: "50m"
+                    requests:
+                      memory: "32Mi"
+                      cpu: "10m"

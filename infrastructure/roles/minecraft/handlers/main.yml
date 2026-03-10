@@ -1,0 +1,4 @@
+- name: Restart Minecraft server
+  community.docker.docker_compose_v2:
+    project_src: "{{ minecraft_config_dir }}"
+    state: restarted

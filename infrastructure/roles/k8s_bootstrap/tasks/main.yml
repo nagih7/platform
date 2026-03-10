@@ -1,0 +1,4 @@
+---
+- name: MetalLB Configuration
+  include_tasks: metallb.yml
+  tags: k8s-metallb

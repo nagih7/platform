@@ -1,0 +1,22 @@
+mount_enabled: true
+mount_points:
+  - path: "/mnt/hdd-backup"
+    src: "/dev/sdb"
+    fstype: "ext4"
+
+minecraft_container_version: "latest"
+minecraft_container: minecraft-server
+minecraft_image: "itzg/minecraft-server:{{ minecraft_container_version }}"
+minecraft_config_dir: "/opt/minecraft-server"
+minecraft_data_dir: "{{ minecraft_config_dir }}/data"
+minecraft_port: 25565
+minecraft_eula: "TRUE"
+minecraft_type: "FABRIC"
+minecraft_version: "1.21.11"
+
+minecraft_memory: "5G"
+minecraft_timezone: "Asia/Ho_Chi_Minh"
+online_mode: "FALSE"
+modrinth_projects: "fabric-api,skinrestorer,terralith,lithium,incendium,appleskin,structory"
+view_distance: "16"
+simulation_distance: "8"

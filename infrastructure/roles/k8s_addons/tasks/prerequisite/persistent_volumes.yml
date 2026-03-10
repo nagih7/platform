@@ -1,0 +1,32 @@
+---
+- name: Persistent Volumes Configuration
+  become: false
+  delegate_to: localhost
+  tags: k8s-pv
+  block:
+    - name: Create Persistent Volumes
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: PersistentVolume
+          metadata:
+            name: "{{ item.name }}"
+          spec:
+            capacity:
+              storage: "{{ item.storage }}"
+            accessModes: [ReadWriteOnce]
+            persistentVolumeReclaimPolicy: "{{ item.policy }}"
+            storageClassName: "{{ item.class }}"
+            local:
+              path: "{{ item.path }}"
+            nodeAffinity:
+              required:
+                nodeSelectorTerms:
+                  - matchExpressions:
+                      - key: kubernetes.io/hostname
+                        operator: In
+                        values:
+                          - "{{ item.node }}"
+
+      loop: "{{ persistent_volumes }}"

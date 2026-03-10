@@ -1,0 +1,16 @@
+---
+- name: Prerequisite
+  include_tasks: prerequisite/main.yml
+  tags: k8s-addons-pre
+
+- name: Proxy Configuration
+  include_tasks: proxy/main.yml
+  tags: k8s-proxy
+
+- name: Proxmox Configuration
+  include_tasks: proxmox.yml
+  tags: k8s-proxmox
+
+- name: Shared Services Configuration
+  include_tasks: shared_services/main.yml
+  tags: k8s-shared

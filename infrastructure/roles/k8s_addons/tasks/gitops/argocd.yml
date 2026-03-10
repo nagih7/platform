@@ -1,0 +1,44 @@
+---
+- name: ArgoCD - GitOps Core
+  become: false
+  delegate_to: localhost
+  tags: k8s-argocd
+  block:
+    - name: 1. Install ArgoCD Official Manifests
+      kubernetes.core.k8s:
+        state: present
+        namespace: argocd
+        src: https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+
+    - name: 2. Create ServersTransport for ArgoCD
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: traefik.io/v1alpha1
+          kind: ServersTransport
+          metadata:
+            name: argocd-transport
+            namespace: argocd
+          spec:
+            insecureSkipVerify: true
+
+    - name: 3. Create IngressRoute for ArgoCD UI
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: traefik.io/v1alpha1
+          kind: IngressRoute
+          metadata:
+            name: argocd-server-ingress
+            namespace: argocd
+          spec:
+            entryPoints:
+              - web
+            routes:
+              - match: "Host(`argocd.{{ base_domain }}`)"
+                kind: Rule
+                services:
+                  - name: argocd-server
+                    port: 443
+                    scheme: https
+                    serversTransport: argocd-transport

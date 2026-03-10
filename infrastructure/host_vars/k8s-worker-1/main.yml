@@ -1,0 +1,5 @@
+mount_enabled: true
+mount_points:
+  - path: "/mnt/hdd/seafile"
+    src: "/dev/sdb"
+    fstype: "ext4"

@@ -1,0 +1,12 @@
+---
+- name: Cloudflare Tunnel Configuration
+  include_tasks: cf_tunnel.yml
+  tags: k8s-tunnel
+
+- name: Cloudflare DDNS Configuration
+  include_tasks: cf_ddns.yml
+  tags: k8s-ddns
+
+- name: Traefik Configuration
+  include_tasks: traefik.yml
+  tags: k8s-traefik

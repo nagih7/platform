@@ -1,0 +1,48 @@
+---
+postgres_port: 5432
+redis_port: 6379
+postgres_node: k8s-worker-1
+
+databases:
+  - {
+      name: "gitlab",
+      user: "gitlab",
+      password: "gitlab_db_pass",
+      namespace: "{{ gitlab_namespace }}",
+    }
+  - {
+      name: "auth",
+      user: "auth",
+      password: "auth_db_pass",
+      namespace: "{{ microservices_namespace }}",
+    }
+  - {
+      name: "blog",
+      user: "blog",
+      password: "blog_db_pass",
+      namespace: "{{ microservices_namespace }}",
+    }
+  - {
+      name: "uniquizz",
+      user: "uniquizz",
+      password: "uniquizz_db_pass",
+      namespace: "{{ microservices_namespace }}",
+    }
+  - {
+      name: "resumind",
+      user: "resumind",
+      password: "hoanggxyuuki",
+      namespace: "{{ microservices_namespace }}",
+    }
+  - {
+      name: "lunar",
+      user: "lunar",
+      password: "hoanggxyuuki",
+      namespace: "{{ microservices_namespace }}",
+    }
+  - {
+      name: "seafile",
+      user: "seafile",
+      password: "seafile_db_pass",
+      namespace: "{{ seafile_namespace }}",
+    }

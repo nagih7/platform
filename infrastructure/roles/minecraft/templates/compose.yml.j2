@@ -1,0 +1,22 @@
+services:
+  minecraft:
+    image: {{ minecraft_image }}
+    container_name: {{ minecraft_container }}
+    restart: unless-stopped
+    ports:
+      - "{{ minecraft_port }}:25565"
+    environment:
+      CREATE_CONSOLE_IN_PIPE: true
+      MOTD: "§6Nooblearn2code §f- §aSurvival Server"
+      MODRINTH_ALLOWED_VERSION_TYPE: "alpha"
+      EULA: {{ minecraft_eula }}
+      TYPE: {{ minecraft_type }}
+      VERSION: {{ minecraft_version }}
+      MEMORY: {{ minecraft_memory }}      
+      TZ: {{ minecraft_timezone }}
+      ONLINE_MODE: {{ online_mode }}
+      MODRINTH_PROJECTS: {{ modrinth_projects }}
+      VIEW_DISTANCE: {{ view_distance }}
+      SIMULATION_DISTANCE: {{ simulation_distance }}
+    volumes:
+      - {{ minecraft_data_dir }}:/data

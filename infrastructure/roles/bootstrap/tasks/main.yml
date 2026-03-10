@@ -1,0 +1,12 @@
+- name: Setup Timezone
+  community.general.timezone:
+    name: "{{ timezone }}"
+
+- name: Disable Cloud Init
+  include_tasks: cloud_init.yml
+
+- name: Mount Hard Drive Configuration
+  include_tasks: mount.yml
+  when:
+    - mount_enabled | default(false) | bool
+    - mount_points | default([]) | length > 0

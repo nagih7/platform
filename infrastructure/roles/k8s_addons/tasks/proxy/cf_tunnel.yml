@@ -1,0 +1,82 @@
+---
+- name: Cloudflare Tunnel Configuration
+  delegate_to: localhost
+  become: false
+  tags: k8s-tunnel
+  block:
+    - name: Create namespace for Cloudflare Tunnel
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Namespace
+          metadata:
+            name: "{{ tunnel_namespace }}"
+
+    - name: Migrate credentials.json to K8s Secret
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: "{{ tunnel_credentials_secret }}"
+            namespace: "{{ tunnel_namespace }}"
+          stringData:
+            credentials.json: "{{ lookup('file', 'tunnel-credentials.json') }}"
+
+    - name: Render config.yml.j2 to K8s ConfigMap
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: ConfigMap
+          metadata:
+            name: "{{ tunnel_config }}"
+            namespace: "{{ tunnel_namespace }}"
+          data:
+            config.yml: "{{ lookup('template', 'cf-tunnel/config.yml.j2') }}"
+
+    - name: Deploy Cloudflared Tunnel Pods
+      kubernetes.core.k8s:
+        state: present
+        definition: |
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            name: {{ tunnel_name }}
+            namespace: {{ tunnel_namespace }}
+          spec:
+            replicas: {{ tunnel_replicas }}
+            selector:
+              matchLabels:
+                app: {{ tunnel_label }}
+            template:
+              metadata:
+                labels:
+                  app: {{ tunnel_label }}
+              spec:
+                containers:
+                - name: {{ tunnel_container }}
+                  image: {{ tunnel_image }}
+                  args:
+                  - tunnel
+                  - --config
+                  - {{ tunnel_config_dir }}
+                  - run
+                  volumeMounts:
+                  - name: config-volume
+                    mountPath: {{ tunnel_config_dir }}
+                    subPath: config.yml
+                    readOnly: true
+                  - name: creds-volume
+                    mountPath: {{ tunnel_credentials_dir }}
+                    subPath: credentials.json
+                    readOnly: true
+                volumes:
+                - name: config-volume
+                  configMap:
+                    name: tunnel-config
+                - name: creds-volume
+                  secret:
+                    secretName: {{ tunnel_credentials_secret }}

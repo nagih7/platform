@@ -1,0 +1,74 @@
+- name: Proxmox Configuration
+  become: false
+  delegate_to: localhost
+  tags: k8s-proxmox
+  block:
+    - name: 1. Create Proxmox namespace
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Namespace
+          metadata:
+            name: "{{ proxmox_namespace }}"
+
+    - name: 2. Create External Service for Proxmox IP
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Service
+          metadata:
+            name: proxmox-external-service
+            namespace: "{{ proxmox_namespace }}"
+          spec:
+            ports:
+              - name: https-web
+                protocol: TCP
+                port: "{{ proxmox_dashboard_port | int }}"
+                targetPort: "{{ proxmox_dashboard_port | int }}"
+
+    - name: 3. Create Endpoints for Proxmox IP
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Endpoints
+          metadata:
+            name: proxmox-external-service
+            namespace: "{{ proxmox_namespace }}"
+          subsets:
+            - addresses:
+                - ip: "{{ proxmox_ip }}"
+              ports:
+                - name: https-web
+                  port: "{{ proxmox_dashboard_port | int }}"
+
+    - name: 4. Deploy Traefik Configuration for Proxmox
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          - apiVersion: traefik.io/v1alpha1
+            kind: ServersTransport
+            metadata:
+              name: proxmox-transport
+              namespace: "{{ proxmox_namespace }}"
+            spec:
+              insecureSkipVerify: true
+
+          - apiVersion: traefik.io/v1alpha1
+            kind: IngressRoute
+            metadata:
+              name: proxmox-ingress
+              namespace: "{{ proxmox_namespace }}"
+            spec:
+              entryPoints:
+                - web
+              routes:
+                - match: "Host(`proxmox.{{ base_domain }}`)"
+                  kind: Rule
+                  services:
+                    - name: proxmox-external-service
+                      port: https-web
+                      scheme: https
+                      serversTransport: proxmox-transport

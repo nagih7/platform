@@ -1,0 +1,67 @@
+---
+- name: Create Minecraft server configuration directory
+  file:
+    path: "{{ minecraft_config_dir }}"
+    state: directory
+    mode: "0755"
+  tags: minecraft
+
+- name: Create Minecraft server data directory
+  file:
+    path: "{{ minecraft_data_dir }}"
+    state: directory
+    mode: "0755"
+  tags: minecraft
+
+- name: Create Minecraft server compose.yml file
+  template:
+    src: compose.yml.j2
+    dest: "{{ minecraft_config_dir }}/compose.yml"
+    mode: "0644"
+  tags: minecraft
+  notify: Restart Minecraft server
+
+- name: Ensure Minecraft server is running
+  community.docker.docker_compose_v2:
+    project_src: "{{ minecraft_config_dir }}"
+    state: present
+  tags: minecraft
+
+- name: Install cron package
+  ansible.builtin.package:
+    name: cron
+    state: present
+  become: true
+
+- name: Ensure cron service is running
+  ansible.builtin.service:
+    name: cron
+    state: started
+    enabled: true
+  become: true
+
+- name: Create backup script
+  ansible.builtin.copy:
+    dest: "{{ minecraft_config_dir }}/backup.sh"
+    mode: "0755"
+    content: |
+      #!/bin/bash
+      TIMESTAMP=$(date +%F_%H%M)
+      tar -czf {{ backup_dir }}/minecraft_${TIMESTAMP}.tar.gz {{ minecraft_data_dir }} > /tmp/backup.log 2>&1
+  become: true
+
+- name: Cronjob auto compress and backup
+  ansible.builtin.cron:
+    name: "Auto Backup Minecraft World"
+    minute: "0"
+    hour: "2,14"
+    job: "/opt/minecraft-server/backup.sh"
+  become: true
+
+- name: Cronjob auto delete backups after 7 days
+  ansible.builtin.cron:
+    name: "Cleanup Old Minecraft Backups"
+    minute: "30"
+    hour: "3" # Chạy lúc 3:30 sáng hàng ngày (tránh giờ backup cao điểm)
+    job: >
+      find {{ backup_dir }} -name "minecraft_*.tar.gz" -type f -mtime +7 -delete

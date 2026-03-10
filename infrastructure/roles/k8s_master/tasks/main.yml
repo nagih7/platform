@@ -1,0 +1,48 @@
+---
+- name: Master Node Configuration
+  become: true
+  tags: k8s-master-setup
+  block:
+    - name: Get Tailscale IP from Master
+      ansible.builtin.command: tailscale ip -4
+      register: master_ts_ip_cmd
+      changed_when: false
+
+    - name: Set fact IP Master
+      ansible.builtin.set_fact:
+        master_ts_ip: "{{ master_ts_ip_cmd.stdout }}"
+
+    - name: Init K3s Server (Bind Tailscale, Disable default Ingress/LB)
+      ansible.builtin.shell: |
+        curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server \
+          --node-ip={{ master_ts_ip }} \
+          --advertise-address={{ master_ts_ip }} \
+          --flannel-iface=tailscale0 \
+          --disable traefik \
+          --disable servicelb \
+          --node-taint node-role.kubernetes.io/control-plane=true:NoSchedule" sh -
+      args:
+        creates: /etc/rancher/k3s/k3s.yaml
+
+    - name: Read Token to join Worker
+      ansible.builtin.slurp:
+        src: /var/lib/rancher/k3s/server/node-token
+      register: node_token
+
+    - name: Save Token to Global Variable
+      ansible.builtin.set_fact:
+        k3s_token: "{{ node_token['content'] | b64decode | trim }}"
+
+    - name: Check if local Kubeconfig exists
+      ansible.builtin.stat:
+        path: ~/.kube/config_homelab
+      register: local_kubeconfig
+      delegate_to: localhost
+      become: false
+
+    - name: Pull Kubeconfig to local
+      ansible.builtin.fetch:
+        src: /etc/rancher/k3s/k3s.yaml
+        dest: ~/.kube/config_homelab
+        flat: yes
+      when: not local_kubeconfig.stat.exists

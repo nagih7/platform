@@ -1,0 +1,19 @@
+---
+- name: K8s Worker Configuration
+  become: true
+  tags: k8s-master-setup
+  block:
+    - name: Lấy IP Tailscale của Worker
+      ansible.builtin.command: tailscale ip -4
+      register: worker_ts_ip_cmd
+      changed_when: false
+
+    - name: Join K3s Agent
+      ansible.builtin.shell: |
+        curl -sfL https://get.k3s.io | K3S_URL="https://{{ hostvars[groups['k8s_master'][0]]['master_ts_ip'] }}:6443" \
+        K3S_TOKEN="{{ hostvars[groups['k8s_master'][0]]['k3s_token'] }}" \
+        INSTALL_K3S_EXEC="agent \
+          --node-ip={{ worker_ts_ip_cmd.stdout }} \
+          --flannel-iface=tailscale0" sh -
+      args:
+        creates: /etc/systemd/system/k3s-agent.service

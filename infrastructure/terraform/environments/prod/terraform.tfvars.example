@@ -1,0 +1,6 @@
+# Copy this file to terraform.tfvars and fill in real values
+# NEVER commit terraform.tfvars to git
+
+proxmox_endpoint    = "https://192.168.1.200:8006/"
+proxmox_api_token   = "root@pam!terraform=<YOUR_TOKEN_HERE>"
+vm_default_password = "<YOUR_PASSWORD_HERE>"

@@ -1,0 +1,8 @@
+---
+- name: Create Namespaces
+  include_tasks: namespaces.yml
+  tags: k8s-ns
+
+- name: Create Persistent Volumes
+  include_tasks: persistent_volumes.yml
+  tags: k8s-pv
