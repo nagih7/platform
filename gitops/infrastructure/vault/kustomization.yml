@@ -4,5 +4,7 @@ resources:
   - app.yml
   - ingress.yml
   - eso.yml
+  - rbac.yml
+  - bootstrap.yml
 
 namespace: vault

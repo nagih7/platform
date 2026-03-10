@@ -1,0 +1,61 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: vault-bootstrap
+  namespace: vault
+  annotations:
+    argocd.argoproj.io/sync-options: Replace=true
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+spec:
+  template:
+    spec:
+      serviceAccountName: vault-admin-sa
+
+      # --- BƯỚC 1: THỢ ĐIỆN CẤU HÌNH VAULT ---
+      initContainers:
+        - name: vault-configurator
+          image: hashicorp/vault:1.15
+          command:
+            - "sh"
+            - "-c"
+            - |
+              set -e
+              export VAULT_ADDR="http://hashicorp-vault.vault.svc.cluster.local:8200"
+              export VAULT_TOKEN=$(cat /vault/secrets/root-token)
+
+              echo "==> Configuring Vault..."
+              vault auth enable kubernetes || true
+              vault write auth/kubernetes/config kubernetes_host="https://kubernetes.default.svc"
+              echo 'path "secret/data/*" { capabilities = ["read"] }' | vault policy write shared-microservices-policy -
+              vault write auth/kubernetes/role/shared-microservices-role \
+                  bound_service_account_names=shared-vault-sa \
+                  bound_service_account_namespaces=microservices \
+                  policies=shared-microservices-policy \
+                  ttl=1h
+              echo "==> CẤU HÌNH VAULT THÀNH CÔNG!"
+          volumeMounts:
+            - name: vault-root-token
+              mountPath: /vault/secrets
+              readOnly: true
+
+      # --- BƯỚC 2: SÁT THỦ TIÊU HỦY CHỨNG CỨ ---
+      containers:
+        - name: secret-destroyer
+          image: bitnami/kubectl:latest
+          command:
+            - "kubectl"
+            - "delete"
+            - "secret"
+            - "vault-bootstrap-token"
+            - "-n"
+            - "vault"
+            # Bùa chú này giúp Job không báo lỗi nếu Secret đã bị xóa từ trước
+            - "--ignore-not-found=true"
+
+      volumes:
+        - name: vault-root-token
+          secret:
+            secretName: vault-bootstrap-token
+      restartPolicy: Never
+  backoffLimit: 1

@@ -4,7 +4,6 @@ resources:
   - deployment.yml
   - service.yml
   - ingress.yml
-  - secret.yml
   - external-secret.yml
 
 # namePrefix: auth-service-
