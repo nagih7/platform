@@ -1,0 +1,32 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: gitlab-runner
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: "https://charts.gitlab.io"
+    chart: gitlab-runner
+    # targetRevision: x.y.z # Bro có thể chọn version chart cụ thể
+    helm:
+      values: |
+        gitlabUrl: "https://gitlab.nooblearn2code.com"
+        runnerToken: "glrt-ByuiPxE5MCSuSxLxxgy5"
+        rbac:
+          create: true
+        runners:
+          config: |
+            [[runners]]
+              [runners.kubernetes]
+                namespace = "gitlab"
+                image = "ubuntu:22.04"
+                privileged = true
+  destination:
+    server: "https://kubernetes.default.svc"
+    namespace: gitlab
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

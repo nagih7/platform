@@ -1,0 +1,26 @@
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: auth-strip-prefix
+spec:
+  stripPrefix:
+    prefixes:
+      - /auth
+
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: auth-service-ingress
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`api.nooblearn2code.com`) && PathPrefix(`/auth`)
+      kind: Rule
+      middlewares:
+        - name: auth-strip-prefix
+      services:
+        - name: auth-service-svc
+          port: 80

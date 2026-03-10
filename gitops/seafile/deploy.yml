@@ -1,0 +1,155 @@
+# ================== DATABASE MARIADB ==================
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: seafile-mysql-pvc
+  namespace: seafile
+spec:
+  accessModes: [ReadWriteOnce]
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 5Gi
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: seafile-mysql
+  namespace: seafile
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: seafile-mysql
+  template:
+    metadata:
+      labels:
+        app: seafile-mysql
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: k8s-worker-1
+      containers:
+        - name: mariadb
+          image: mariadb:10.11
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: seafile-credentials
+                  key: password
+            - name: MYSQL_LOG_CONSOLE
+              value: "true"
+          volumeMounts:
+            - name: mysql-data
+              mountPath: /var/lib/mysql
+      volumes:
+        - name: mysql-data
+          persistentVolumeClaim:
+            claimName: seafile-mysql-pvc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: seafile-mysql-service
+  namespace: seafile
+spec:
+  selector:
+    app: seafile-mysql
+  ports:
+    - port: 3306
+
+# ================== SEAFILE APP ==================
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: seafile-pvc
+  namespace: seafile
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 100Gi
+  volumeName: seafile-pv
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: seafile
+  namespace: seafile
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: seafile
+  template:
+    metadata:
+      labels:
+        app: seafile
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: k8s-worker-1
+      containers:
+        - name: seafile
+          image: seafileltd/seafile-mc:latest
+          ports:
+            - containerPort: 80
+          env:
+            - name: DB_HOST
+              value: "seafile-mysql-service"
+            - name: DB_ROOT_PASSWD
+              valueFrom:
+                secretKeyRef:
+                  name: seafile-credentials
+                  key: password
+
+            # --- ADMIN CONFIGURE (Có thể đổi sau khi login) ---
+            - name: SEAFILE_ADMIN_EMAIL
+              value: "nooblearn2code@gmail.com"
+            - name: SEAFILE_ADMIN_PASSWORD
+              value: "nooblearn2code"
+            - name: SEAFILE_SERVER_HOSTNAME
+              value: "seafile.nooblearn2code.com"
+
+          volumeMounts:
+            - name: seafile-data
+              mountPath: /shared
+      volumes:
+        - name: seafile-data
+          persistentVolumeClaim:
+            claimName: seafile-pvc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: seafile-service
+  namespace: seafile
+spec:
+  selector:
+    app: seafile
+  ports:
+    - port: 80
+      targetPort: 80
+
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: seafile-ingress
+  namespace: seafile
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`seafile.nooblearn2code.com`)
+      kind: Rule
+      services:
+        - name: seafile-service
+          port: 80
