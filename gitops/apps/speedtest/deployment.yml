@@ -30,7 +30,7 @@ spec:
               value: "https://speedtest.nooblearn2code.com"
           ports:
             - containerPort: 80
-          volumeMount:
+          volumeMounts:
             - name: config
               mountPath: /config
           resources:
