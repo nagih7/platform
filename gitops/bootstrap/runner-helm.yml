@@ -9,7 +9,7 @@ spec:
   source:
     repoURL: "https://charts.gitlab.io"
     chart: gitlab-runner
-    # targetRevision: x.y.z # Bro có thể chọn version chart cụ thể
+    targetRevision: 0.86.0
     helm:
       values: |
         gitlabUrl: "https://gitlab.nooblearn2code.com"

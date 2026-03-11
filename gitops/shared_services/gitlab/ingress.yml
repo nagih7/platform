@@ -1,0 +1,15 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: gitlab-ingress
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`gitlab.nooblearn2code.com`)
+      kind: Rule
+      services:
+        - name: gitlab-service
+          port: 80
+      middlewares:
+        - name: secure-headers
