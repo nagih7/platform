@@ -13,6 +13,8 @@ spec:
       labels:
         app: gitlab
     spec:
+      nodeSelector:
+        kubernetes.io/hostname: k8s-worker-1
       containers:
         - name: gitlab
           image: gitlab/gitlab-ce:16.11.0-ce.0
