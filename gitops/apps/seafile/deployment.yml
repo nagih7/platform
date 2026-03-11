@@ -3,7 +3,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: seafile-mysql
-  namespace: seafile
 spec:
   replicas: 1
   selector:
@@ -40,7 +39,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: seafile
-  namespace: seafile
 spec:
   replicas: 1
   selector:

@@ -12,7 +12,6 @@ spec:
     spec:
       serviceAccountName: vault-admin-sa
 
-      # --- BƯỚC 1: THỢ ĐIỆN CẤU HÌNH VAULT ---
       initContainers:
         - name: vault-configurator
           image: hashicorp/vault:1.15
