@@ -47,7 +47,7 @@
     content: |
       #!/bin/bash
       TIMESTAMP=$(date +%F_%H%M)
-      tar -czf {{ backup_dir }}/minecraft_${TIMESTAMP}.tar.gz {{ minecraft_data_dir }} > /tmp/backup.log 2>&1
+      tar -czf {{ minecraft_backup_dir }}/minecraft_${TIMESTAMP}.tar.gz {{ minecraft_data_dir }} > /tmp/backup.log 2>&1
   become: true
 
 - name: Cronjob auto compress and backup
@@ -64,4 +64,4 @@
     minute: "30"
     hour: "3" # Chạy lúc 3:30 sáng hàng ngày (tránh giờ backup cao điểm)
     job: >
-      find {{ backup_dir }} -name "minecraft_*.tar.gz" -type f -mtime +7 -delete
+      find {{ minecraft_backup_dir }} -name "minecraft_*.tar.gz" -type f -mtime +7 -delete

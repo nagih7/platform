@@ -1,6 +1,8 @@
+minecraft_backup_dir: "{{ data_mount_path }}/minecraft-backup"
+
 mount_enabled: true
 mount_points:
-  - path: "{{ data_mount_path }}"
+  - path: "{{ minecraft_backup_dir }}"
     src: "/dev/sdb"
     fstype: "ext4"
 
