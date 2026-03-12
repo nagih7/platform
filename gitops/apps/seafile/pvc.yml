@@ -5,7 +5,7 @@ metadata:
   name: seafile-mysql-pvc
 spec:
   accessModes: [ReadWriteOnce]
-  storageClassName: local-path
+  storageClassName: local-path-retain
   resources:
     requests:
       storage: 5Gi
@@ -14,13 +14,13 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: seafile-pvc
+  name: seafile-data-pvc
   namespace: seafile
 spec:
   accessModes:
     - ReadWriteOnce
-  storageClassName: local-path
+  storageClassName: data-pool-sc
   resources:
     requests:
       storage: 100Gi
-  volumeName: seafile-pv
+  volumeName: seafile-data-pv

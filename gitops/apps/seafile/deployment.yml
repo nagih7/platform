@@ -51,6 +51,27 @@ spec:
     spec:
       nodeSelector:
         kubernetes.io/hostname: k8s-worker-1
+      initContainers:
+        - name: csrf-patcher
+          image: alpine:latest
+          command: ["sh", "-c"]
+          args:
+            - |
+              FILE="/shared/seafile/conf/seahub_settings.py"
+              if [ -f "$FILE" ]; then
+                if ! grep -q "CSRF_TRUSTED_ORIGINS" "$FILE"; then
+                  echo "" >> "$FILE"
+                  echo "CSRF_TRUSTED_ORIGINS = ['https://seafile.nooblearn2code.com']" >> "$FILE"
+                  echo "==> CSRF patch injected successfully!"
+                else
+                  echo "==> CSRF patch already exists. Skipping!"
+                fi
+              else
+                echo "==> Config file not found yet. Skipping patch..."
+              fi
+          volumeMounts:
+            - name: seafile-data
+              mountPath: /shared
       containers:
         - name: seafile
           image: seafileltd/seafile-mc:latest
@@ -79,4 +100,4 @@ spec:
       volumes:
         - name: seafile-data
           persistentVolumeClaim:
-            claimName: seafile-pvc
+            claimName: seafile-data-pvc
