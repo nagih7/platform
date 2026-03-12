@@ -48,10 +48,10 @@ virtual_machines:
         file_format: "raw"
         discard: "on"
         ssd: true
-      - datastore_id: "hdd-storage"
+      - datastore_id: "data-pool"
         interface: "scsi1"
         size: 100
-        file_format: "qcow2"
+        file_format: "raw"
         discard: "on"
 
     dns:
@@ -85,10 +85,10 @@ virtual_machines:
         file_format: "raw"
         discard: "on"
         ssd: true
-      - datastore_id: "hdd-storage"
+      - datastore_id: "data-pool"
         interface: "scsi1"
-        size: 100
-        file_format: "qcow2"
+        size: 20
+        file_format: "raw"
         discard: "on"
 
     dns:

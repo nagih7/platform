@@ -1,5 +1,5 @@
 mount_enabled: true
 mount_points:
-  - path: "/mnt/hdd/seafile"
-    src: "/dev/sdb"
+  - path: "{{ data_mount_path }}"
+    src: "/dev/sdc"
     fstype: "ext4"

@@ -1,6 +1,6 @@
 mount_enabled: true
 mount_points:
-  - path: "/mnt/hdd-backup"
+  - path: "{{ data_mount_path }}"
     src: "/dev/sdb"
     fstype: "ext4"
 
