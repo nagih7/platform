@@ -1,0 +1,109 @@
+# Application Configuration
+app:
+  name: "esl-server"
+  version: "1.0.0"
+  environment: "production"
+
+# Server Configuration
+server:
+  port: 8080
+  mode: production
+  read_timeout: 30s
+  write_timeout: 30s
+  idle_timeout: 60s
+  graceful_shutdown_timeout: 30s
+
+# SMTP Configuration
+smtp:
+  host: smtp.gmail.com
+  port: 587
+  username: nooblearn2code@gmail.com
+  password: whoq fbuw edpo lnui
+  timeout: 10s
+  retry_attempts: 3
+
+# Database Configuration
+database:
+  host: "shared-postgres-service.shared-services.svc.cluster.local"
+  port: 5432
+  username: esl
+  password: esl_db_pass
+  name: esl
+  timezone: Asia/Ho_Chi_Minh
+  max_idle_connections: 10
+  max_open_connections: 100
+  connection_max_lifetime: 3600
+  connection_max_idle_time: 300
+  ssl_mode: disable
+
+# Redis Configuration
+redis:
+  host: "shared-redis-service.shared-services.svc.cluster.local"
+  port: 6379
+  password: "nooblearn2code_redis_pass"
+  database: 0
+  pool_size: 10
+  min_idle_connections: 5
+  max_retries: 3
+  timeout: 5s
+
+# Security Configuration
+security:
+  jwt:
+    secret: "your-super-secret-jwt-key-change-in-production"
+    expiration: 1h
+    refresh:
+      secret: "your-super-secret-refresh-key-change-in-production"
+      expiration: 24h
+  bcrypt:
+    cost: 12
+  rate_limit:
+    requests_per_minute: 60
+    burst: 10
+  cors:
+    allowed_origins: ["http://localhost:3000", "https://yourdomain.com"]
+    allowed_methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+    allowed_headers: ["Content-Type", "Authorization"]
+    allow_credentials: true
+
+# OTP Configuration
+otp:
+  expiration: 5
+  length: 6
+  max_attempts: 3
+  cooldown_period: 1
+
+# 2FA Configuration
+two_factor:
+  issuer: "AuthService"
+  algorithm: "SHA1"
+  digits: 6
+  period: 30
+
+# Logger Configuration
+logger:
+  level: debug # debug, info, warn, error
+  format: json # json, text
+  output: ["console", "file"]
+  file:
+    path: "./storages/logs/"
+    name: "auth-service.log"
+    max_size: 50 # MB
+    max_backups: 3
+    max_age: 28 # days
+    compress: true
+
+# Metrics and Monitoring
+monitoring:
+  enabled: true
+  metrics_port: 9090
+  health_check_path: "/health"
+  readiness_path: "/ready"
+
+# Feature Flags
+features:
+  email_verification: true
+  phone_verification: false
+  two_factor_auth: true
+  social_login: false
+  password_reset: true

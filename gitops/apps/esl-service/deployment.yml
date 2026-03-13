@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: esl-service-api-server
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: esl-service
+  template:
+    metadata:
+      labels:
+        app: esl-service
+    spec:
+      containers:
+        - name: app
+          image: nooblearn2code/ethnosoul-legacy-server:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          env:
+            - name: APP_ENV
+              value: "production"
+          # volumeMounts:
+          #   - name: config-volume
+          #     mountPath: /app/configs/production.yaml
+          #     subPath: production.yaml
+          #     readOnly: true
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "64Mi"
+            limits:
+              cpu: "250m"
+              memory: "256Mi"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 20
+      # volumes:
+      #   - name: config-volume
+      #     configMap:
+      #       name: esl-server-config

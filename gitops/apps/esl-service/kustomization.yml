@@ -6,8 +6,10 @@ resources:
   - ingress.yml
   - external-secret.yml
 
-# namePrefix: auth-service-
-
 commonLabels:
-  app: auth-service
+  app: esl-service
   tier: backend
+# configMapGenerator:
+#   - name: esl-server-config
+#     files:
+#       - production.yaml=configs/production.yaml

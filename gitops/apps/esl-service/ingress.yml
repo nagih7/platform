@@ -1,0 +1,13 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: esl-service-ingress
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`api.ethnosoul-legacy.vn`)
+      kind: Rule
+      services:
+        - name: esl-service-svc
+          port: 80
