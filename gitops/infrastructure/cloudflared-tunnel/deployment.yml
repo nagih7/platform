@@ -20,6 +20,8 @@ spec:
             - tunnel
             - --config
             - /etc/cloudflared/config/config.yml
+            - --credentials-file
+            - /etc/cloudflared/creds/credentials.json
             - run
           volumeMounts:
             - name: config-volume
