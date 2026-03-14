@@ -21,11 +21,6 @@ spec:
           env:
             - name: APP_ENV
               value: "production"
-          # volumeMounts:
-          #   - name: config-volume
-          #     mountPath: /app/configs/production.yaml
-          #     subPath: production.yaml
-          #     readOnly: true
           resources:
             requests:
               cpu: "50m"
@@ -45,7 +40,3 @@ spec:
               port: 8080
             initialDelaySeconds: 15
             periodSeconds: 20
-      # volumes:
-      #   - name: config-volume
-      #     configMap:
-      #       name: esl-server-config

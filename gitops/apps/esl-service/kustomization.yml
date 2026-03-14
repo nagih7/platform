@@ -4,12 +4,7 @@ resources:
   - deployment.yml
   - service.yml
   - ingress.yml
-  - external-secret.yml
 
 commonLabels:
   app: esl-service
   tier: backend
-# configMapGenerator:
-#   - name: esl-server-config
-#     files:
-#       - production.yaml=configs/production.yaml

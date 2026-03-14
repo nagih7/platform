@@ -29,11 +29,11 @@ spec:
               vault write auth/kubernetes/config kubernetes_host="https://kubernetes.default.svc"
 
               echo "==> Configuring Microservices Role"
-              echo 'path "secret/data/*" { capabilities = ["read"] }' | vault policy write shared-microservices-policy -
-              vault write auth/kubernetes/role/shared-microservices-role \
-                  bound_service_account_names=shared-vault-sa \
-                  bound_service_account_namespaces=microservices \
-                  policies=shared-microservices-policy \
+              echo 'path "apps/data/*" { capabilities = ["read"] }' | vault policy write ms-policy -
+              vault write auth/kubernetes/role/ms-role \
+                  bound_service_account_names=ms-vault-sa \
+                  bound_service_account_namespaces=microservices,vault \
+                  policies=ms-policy \
                   ttl=1h
 
               echo "==> Configuring Infrastructure Role"

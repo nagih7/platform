@@ -1,16 +1,16 @@
 apiVersion: external-secrets.io/v1beta1
 kind: SecretStore
 metadata:
-  name: shared-microservices-vault-backend
+  name: ms-vault-backend
 spec:
   provider:
     vault:
       server: "http://hashicorp-vault.vault.svc.cluster.local:8200"
-      path: "secret"
+      path: "apps"
       version: "v2"
       auth:
         kubernetes:
           mountPath: "kubernetes"
-          role: "shared-microservices-role"
+          role: "ms-role"
           serviceAccountRef:
-            name: "shared-vault-sa"
+            name: "ms-vault-sa"
