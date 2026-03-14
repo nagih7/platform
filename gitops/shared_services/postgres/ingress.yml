@@ -1,13 +1,12 @@
 apiVersion: traefik.io/v1alpha1
-kind: IngressRoute
+kind: IngressRouteTCP
 metadata:
   name: shared-postgres-ingress
 spec:
   entryPoints:
-    - web
+    - postgres
   routes:
-    - match: Host(`postgres.nooblearn2code.com`)
-      kind: Rule
+    - match: HostSNI(`*`)
       services:
         - name: shared-postgres-service
           port: 5432

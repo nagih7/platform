@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloudflare-tunnel
+  namespace: cloudflare
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: cloudflare-tunnel
+  template:
+    metadata:
+      labels:
+        app: cloudflare-tunnel
+    spec:
+      containers:
+        - name: cloudflared
+          image: cloudflare/cloudflared:latest
+          args:
+            - tunnel
+            - --config
+            - /etc/cloudflared/config/config.yml
+            - run
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/cloudflared/config
+              readOnly: true
+            - name: creds-volume
+              mountPath: /etc/cloudflared/creds
+              readOnly: true
+      volumes:
+        - name: config-volume
+          configMap:
+            name: tunnel-config
+        - name: creds-volume
+          secret:
+            secretName: tunnel-credentials-secret

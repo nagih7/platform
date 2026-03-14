@@ -1,7 +1,7 @@
 apiVersion: external-secrets.io/v1beta1
-kind: SecretStore
+kind: ClusterSecretStore
 metadata:
-  name: shared-microservices-vault-backend
+  name: infra-vault-backend
 spec:
   provider:
     vault:
@@ -11,6 +11,6 @@ spec:
       auth:
         kubernetes:
           mountPath: "kubernetes"
-          role: "shared-microservices-role"
+          role: "infra-role"
           serviceAccountRef:
-            name: "shared-vault-sa"
+            name: "infra-vault-sa"

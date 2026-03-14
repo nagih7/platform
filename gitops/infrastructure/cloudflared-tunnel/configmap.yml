@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tunnel-config
+  namespace: cloudflare
+data:
+  config.yml: |
+    tunnel: e32cb21a-6b8b-45dd-be2c-3f7af3546777 
+    credentials-file: /etc/cloudflared/credentials.json
+
+    ingress:
+      - service: http://traefik.traefik-system.svc.cluster.local:80

@@ -8,6 +8,7 @@ metadata:
     argocd.argoproj.io/hook: Sync
     argocd.argoproj.io/hook-delete-policy: HookSucceeded
 spec:
+  backoffLimit: 1
   template:
     spec:
       serviceAccountName: vault-admin-sa
@@ -26,19 +27,28 @@ spec:
               echo "==> Configuring Vault..."
               vault auth enable kubernetes || true
               vault write auth/kubernetes/config kubernetes_host="https://kubernetes.default.svc"
+
+              echo "==> Configuring Microservices Role"
               echo 'path "secret/data/*" { capabilities = ["read"] }' | vault policy write shared-microservices-policy -
               vault write auth/kubernetes/role/shared-microservices-role \
                   bound_service_account_names=shared-vault-sa \
                   bound_service_account_namespaces=microservices \
                   policies=shared-microservices-policy \
                   ttl=1h
-              echo "==> CẤU HÌNH VAULT THÀNH CÔNG!"
+
+              echo "==> Configuring Infrastructure Role"
+              echo 'path "infrastructure/data/*" { capabilities = ["read"] }' | vault policy write infra-policy -
+              vault write auth/kubernetes/role/infra-role \
+                  bound_service_account_names=infra-vault-sa \
+                  bound_service_account_namespaces=cloudflare,infrastructure,argocd \
+                  policies=infra-policy \
+                  ttl=1h
+
           volumeMounts:
             - name: vault-root-token
               mountPath: /vault/secrets
               readOnly: true
 
-      # --- BƯỚC 2: SÁT THỦ TIÊU HỦY CHỨNG CỨ ---
       containers:
         - name: secret-destroyer
           image: bitnami/kubectl:latest
@@ -49,12 +59,13 @@ spec:
             - "vault-bootstrap-token"
             - "-n"
             - "vault"
-            # Bùa chú này giúp Job không báo lỗi nếu Secret đã bị xóa từ trước
             - "--ignore-not-found=true"
 
       volumes:
         - name: vault-root-token
           secret:
             secretName: vault-bootstrap-token
+            items:
+              - key: root-token
+                path: root-token
       restartPolicy: Never
-  backoffLimit: 1
