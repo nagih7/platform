@@ -9,4 +9,7 @@ data:
     credentials-file: /etc/cloudflared/creds/credentials.json
 
     ingress:
+      - hostname: postgres.nooblearn2code.com
+        service: tcp://shared-postgres-service.shared-services.svc.cluster.local:5432
+
       - service: http://traefik.traefik-system.svc.cluster.local:80

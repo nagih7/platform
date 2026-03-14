@@ -1,0 +1,17 @@
+apiVersion: external-secrets.io/v1beta1
+kind: ClusterSecretStore
+metadata:
+  name: shared-services-vault-backend
+spec:
+  provider:
+    vault:
+      server: "http://hashicorp-vault.vault.svc.cluster.local:8200"
+      path: "shared-services"
+      version: "v2"
+      auth:
+        kubernetes:
+          mountPath: "kubernetes"
+          role: "shared-services-role"
+          serviceAccountRef:
+            name: "shared-services-vault-sa"
+            namespace: "vault"

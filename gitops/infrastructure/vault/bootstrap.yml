@@ -44,6 +44,14 @@ spec:
                   policies=infra-policy \
                   ttl=1h
 
+              echo "==> Configuring Shared Services Role"
+              echo 'path "shared-services/data/*" { capabilities = ["read"] }' | vault policy write shared-services-policy -
+              vault write auth/kubernetes/role/shared-services-role \
+                  bound_service_account_names=shared-services-vault-sa \
+                  bound_service_account_namespaces=shared-services,vault,database \
+                  policies=shared-services-policy \
+                  ttl=1h
+
           volumeMounts:
             - name: vault-root-token
               mountPath: /vault/secrets
