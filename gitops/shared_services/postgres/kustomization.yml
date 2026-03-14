@@ -5,3 +5,4 @@ resources:
   - init_script.yml
   - statefulset.yml
   - service.yml
+  - ingress.yml
