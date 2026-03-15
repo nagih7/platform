@@ -1,4 +1,0 @@
----
-- name: Traefik Configuration
-  include_tasks: traefik.yml
-  tags: k8s-traefik

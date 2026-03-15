@@ -1,7 +1,0 @@
----
-- name: Shared Services Configuration
-  tags: k8s-shared
-  block:
-    - name: Shared Service Bootstrap
-      include_tasks: bootstrap.yml
-      tags: k8s-shared-bootstrap
