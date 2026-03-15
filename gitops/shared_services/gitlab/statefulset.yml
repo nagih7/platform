@@ -19,9 +19,9 @@ spec:
         - name: gitlab
           image: gitlab/gitlab-ce:16.11.0-ce.0
           imagePullPolicy: IfNotPresent
-          env:
-            - name: GITLAB_OMNIBUS_CONFIG
-              value: "from_file '/etc/gitlab/gitlab.rb'"
+          envFrom:
+            - secretRef:
+                name: gitlab-omnibus-secret
           ports:
             - containerPort: 80
               name: http
