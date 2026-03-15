@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloudflare-ddns
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cloudflare-ddns
+  template:
+    metadata:
+      labels:
+        app: cloudflare-ddns
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: k8s-worker-1
+      containers:
+        - name: cloudflare-ddns
+          image: oznu/cloudflare-ddns:latest
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - secretRef:
+                name: cloudflare-ddns-secret
+          env:
+            - name: ZONE
+              value: "nooblearn2code.com"
+            - name: SUBDOMAIN
+              value: "gateway"
+            - name: PROXIED
+              value: "false"
+          resources:
+            limits:
+              memory: "64Mi"
+              cpu: "50m"
+            requests:
+              memory: "32Mi"
+              cpu: "10m"
