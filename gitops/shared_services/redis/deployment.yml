@@ -23,12 +23,9 @@ spec:
               "--appendonly",
               "yes",
             ]
-          env:
-            - name: REDIS_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: shared-db-secrets
-                  key: redis-password
+          envFrom:
+            - secretRef:
+                name: shared-redis-secret
           ports:
             - containerPort: 6379
           volumeMounts:
