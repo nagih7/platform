@@ -40,7 +40,7 @@ spec:
               echo 'path "infrastructure/data/*" { capabilities = ["read"] }' | vault policy write infra-policy -
               vault write auth/kubernetes/role/infra-role \
                   bound_service_account_names=infra-vault-sa \
-                  bound_service_account_namespaces=cloudflare,infrastructure,vault \
+                  bound_service_account_namespaces=cloudflare,infrastructure,vault,traefik \
                   policies=infra-policy \
                   ttl=1h
 
