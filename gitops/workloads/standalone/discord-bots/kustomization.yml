@@ -3,5 +3,8 @@ kind: Kustomization
 namespace: discord-bots
 
 resources:
-  - external-secret.yml
-  - configmap.yml
+  - vault-backend.yml
+  - base
+  - overlays/bot-1
+  - overlays/bot-2
+  - overlays/bot-3
