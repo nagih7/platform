@@ -32,7 +32,7 @@ spec:
               echo 'path "apps/data/*" { capabilities = ["read"] }' | vault policy write ms-policy -
               vault write auth/kubernetes/role/ms-role \
                   bound_service_account_names=ms-vault-sa \
-                  bound_service_account_namespaces=microservices,vault \
+                  bound_service_account_namespaces=microservices,vault,discord-bots \
                   policies=ms-policy \
                   ttl=1h
 

@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: discord-bot
+  labels:
+    app: dmb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dmb
+  template:
+    metadata:
+      labels:
+        app: dmb
+    spec:
+      containers:
+        - name: bot
+          image: docker.io/nooblearn2code/discord-music-bot:latest
+          envFrom:
+            - secretRef:
+                name: bot-token-secret
+            - secretRef:
+                name: dmb-secret
+            - configMapRef:
+                name: dmb-config
