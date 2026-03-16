@@ -1,0 +1,24 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: standalone-vault-sa
+  namespace: discord-bots
+---
+apiVersion: external-secrets.io/v1beta1
+kind: SecretStore
+metadata:
+  name: discord-vault-backend
+  namespace: discord-bots
+spec:
+  provider:
+    vault:
+      server: "http://hashicorp-vault.vault.svc.cluster.local:8200"
+      path: "workloads"
+      version: "v2"
+      auth:
+        kubernetes:
+          mountPath: "kubernetes"
+          role: "standalone-role"
+          serviceAccountRef:
+            name: "standalone-vault-sa"

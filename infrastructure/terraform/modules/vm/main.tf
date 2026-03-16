@@ -51,7 +51,7 @@ resource "proxmox_virtual_environment_vm" "this" {
     }
   }
 
-  lifecycle {
-    prevent_destroy = true
-  }
+  # lifecycle {
+  #   prevent_destroy = true
+  # }
 }

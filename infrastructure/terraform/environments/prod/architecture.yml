@@ -40,7 +40,7 @@ virtual_machines:
     template_id: 9001
 
     cpu: 4
-    memory: 8192
+    memory: 12288
     disks:
       - datastore_id: "local-lvm"
         interface: "scsi0"
@@ -105,44 +105,44 @@ virtual_machines:
         - "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIB5zy0044P9cHpQ9zhu3wdnGzPrYIeVHavdd3sxeopHU vuongmanhnghia@gmail.com"
         - "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAcAhDKqQubrgkHLasQ7IYnLR5v45TkXw2FJ3o5rPBgL vuongmanhnghia@gmail.com"
 
-  david:
-    id: 602
-    name: "david"
-    node: "nagih"
-    scsi_hardware: "virtio-scsi-single"
-
-    template_id: 9000
-
-    cpu: 2
-    memory: 4096
-    disks:
-      - datastore_id: "local-lvm"
-        interface: "scsi0"
-        size: 30
-        file_format: "raw"
-        discard: "on"
-        ssd: true
-
-    dns:
-      - "8.8.8.8"
-      - "1.1.1.1"
-
-    ip_config:
-      address: "192.168.1.62/24"
-      gateway: "192.168.1.1"
-
-    user:
-      username: "david"
-      keys:
-        - "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPm/jank+if691bXnVDX3shVAo/whFvBBb+GJdyAt5+t datlht3@fpt.com"
-
+  # david:
+  #   id: 602
+  #   name: "david"
+  #   node: "nagih"
+  #   scsi_hardware: "virtio-scsi-single"
+  #
+  #   template_id: 9000
+  #
+  #   cpu: 2
+  #   memory: 4096
+  #   disks:
+  #     - datastore_id: "local-lvm"
+  #       interface: "scsi0"
+  #       size: 30
+  #       file_format: "raw"
+  #       discard: "on"
+  #       ssd: true
+  #
+  #   dns:
+  #     - "8.8.8.8"
+  #     - "1.1.1.1"
+  #
+  #   ip_config:
+  #     address: "192.168.1.62/24"
+  #     gateway: "192.168.1.1"
+  #
+  #   user:
+  #     username: "david"
+  #     keys:
+  #       - "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPm/jank+if691bXnVDX3shVAo/whFvBBb+GJdyAt5+t datlht3@fpt.com"
+  #
   darwin:
     id: 603
     name: "darwin"
     node: "nagih"
     scsi_hardware: "virtio-scsi-single"
 
-    template_id: 9000
+    template_id: 9001
 
     cpu: 2
     memory: 4096
@@ -165,38 +165,38 @@ virtual_machines:
     user:
       username: "darwin"
       keys:
-        - "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDtdlKk+03CjY0dePqsf8WhNeE7QeIpYe0+arF5+mwkh tungnt106@fpt.com"
+        - "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINr/kXGh72YNHbPGsefCCVNDSiK0/lPdJ3GFjxV/PNOz darwin"
 
-  master:
-    id: 604
-    name: "master"
-    node: "nagih"
-    scsi_hardware: "virtio-scsi-single"
-
-    template_id: 9000
-
-    cpu: 2
-    memory: 6144
-    disks:
-      - datastore_id: "local-lvm"
-        interface: "scsi0"
-        size: 40
-        file_format: "raw"
-        discard: "on"
-        ssd: true
-
-    dns:
-      - "8.8.8.8"
-      - "1.1.1.1"
-
-    ip_config:
-      address: "192.168.1.64/24"
-      gateway: "192.168.1.1"
-
-    user:
-      username: "david"
-      keys:
-        - "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPm/jank+if691bXnVDX3shVAo/whFvBBb+GJdyAt5+t datlht3@fpt.com"
+  # master:
+  #   id: 604
+  #   name: "master"
+  #   node: "nagih"
+  #   scsi_hardware: "virtio-scsi-single"
+  #
+  #   template_id: 9000
+  #
+  #   cpu: 2
+  #   memory: 6144
+  #   disks:
+  #     - datastore_id: "local-lvm"
+  #       interface: "scsi0"
+  #       size: 40
+  #       file_format: "raw"
+  #       discard: "on"
+  #       ssd: true
+  #
+  #   dns:
+  #     - "8.8.8.8"
+  #     - "1.1.1.1"
+  #
+  #   ip_config:
+  #     address: "192.168.1.64/24"
+  #     gateway: "192.168.1.1"
+  #
+  #   user:
+  #     username: "david"
+  #     keys:
+  #       - "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPm/jank+if691bXnVDX3shVAo/whFvBBb+GJdyAt5+t datlht3@fpt.com"
 
   kiendt:
     id: 605

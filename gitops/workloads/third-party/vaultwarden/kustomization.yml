@@ -1,11 +1,15 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
+  - namespace.yml
   - pvc.yml
+  - vault-backend.yml
   - external-secret.yml
   - deployment.yml
   - service.yml
   - ingress.yml
+
+namespace: vaultwarden
 
 commonLabels:
   app: vaultwarden

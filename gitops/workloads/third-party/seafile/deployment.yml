@@ -18,12 +18,14 @@ spec:
       containers:
         - name: mariadb
           image: mariadb:10.11
+          args:
+            - "--skip-grant-tables"
           env:
             - name: MYSQL_ROOT_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: seafile-credentials
-                  key: password
+                  name: seafile-secret
+                  key: db_password
             - name: MYSQL_LOG_CONSOLE
               value: "true"
           volumeMounts:
@@ -83,14 +85,21 @@ spec:
             - name: DB_ROOT_PASSWD
               valueFrom:
                 secretKeyRef:
-                  name: seafile-credentials
-                  key: password
+                  name: seafile-secret
+                  key: db_password
 
-            # --- ADMIN CONFIGURE (Có thể đổi sau khi login) ---
             - name: SEAFILE_ADMIN_EMAIL
-              value: "nooblearn2code@gmail.com"
+              valueFrom:
+                secretKeyRef:
+                  name: seafile-secret
+                  key: admin_email
+
             - name: SEAFILE_ADMIN_PASSWORD
-              value: "nooblearn2code"
+              valueFrom:
+                secretKeyRef:
+                  name: seafile-secret
+                  key: admin_password
+
             - name: SEAFILE_SERVER_HOSTNAME
               value: "seafile.nooblearn2code.com"
 

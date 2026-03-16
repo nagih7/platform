@@ -28,14 +28,6 @@ spec:
               vault auth enable kubernetes || true
               vault write auth/kubernetes/config kubernetes_host="https://kubernetes.default.svc"
 
-              echo "==> Configuring Microservices Role"
-              echo 'path "apps/data/*" { capabilities = ["read"] }' | vault policy write ms-policy -
-              vault write auth/kubernetes/role/ms-role \
-                  bound_service_account_names=ms-vault-sa \
-                  bound_service_account_namespaces=microservices,vault,discord-bots \
-                  policies=ms-policy \
-                  ttl=1h
-
               echo "==> Configuring Infrastructure Role"
               echo 'path "infrastructure/data/*" { capabilities = ["read"] }' | vault policy write infra-policy -
               vault write auth/kubernetes/role/infra-role \
@@ -50,6 +42,30 @@ spec:
                   bound_service_account_names=shared-services-vault-sa \
                   bound_service_account_namespaces=shared-services,vault,database,gitlab \
                   policies=shared-services-policy \
+                  ttl=1h
+
+              echo "==> Configuring Microservices Role"
+              echo 'path "workloads/data/microservices/*" { capabilities = ["read"] }' | vault policy write workloads-microservices-policy -
+              vault write auth/kubernetes/role/microservices-role \
+                  bound_service_account_names=ms-vault-sa \
+                  bound_service_account_namespaces=microservices \
+                  policies=workloads-microservices-policy \
+                  ttl=1h
+
+              echo "==> Configuring Standalone Role"
+              echo 'path "workloads/data/standalone/*" { capabilities = ["read"] }' | vault policy write workloads-standalone-policy -
+              vault write auth/kubernetes/role/standalone-role \
+                  bound_service_account_names=standalone-vault-sa \
+                  bound_service_account_namespaces=discord-bots \
+                  policies=workloads-standalone-policy \
+                  ttl=1h
+
+              echo "==> Configuring Third-Party Role"
+              echo 'path "workloads/data/third-party/*" { capabilities = ["read"] }' | vault policy write workloads-third-party-policy -
+              vault write auth/kubernetes/role/third-party-role \
+                  bound_service_account_names=third-party-vault-sa \
+                  bound_service_account_namespaces=vaultwarden,seafile,discord-bots \
+                  policies=workloads-third-party-policy \
                   ttl=1h
 
           volumeMounts:

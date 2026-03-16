@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: microservices
+  name: workloads
   namespace: argocd
 spec:
   generators:
@@ -9,7 +9,7 @@ spec:
         repoURL: "https://github.com/nagih7/platform.git"
         revision: main
         directories:
-          - path: gitops/apps/*
+          - path: gitops/workloads/*
   template:
     metadata:
       name: "{{path.basename}}"
@@ -21,8 +21,10 @@ spec:
         path: "{{path}}"
       destination:
         server: "https://kubernetes.default.svc"
-        namespace: "microservices" # '{{path.basename}}'
+        namespace: "{{path.basename}}" # '{{path.basename}}'
       syncPolicy:
         automated:
           prune: true
           selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
