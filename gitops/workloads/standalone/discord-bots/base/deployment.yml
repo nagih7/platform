@@ -19,7 +19,7 @@ spec:
           image: docker.io/nooblearn2code/discord-music-bot:latest
           envFrom:
             - secretRef:
-                name: bot-token-secret
+                name: bot-secret
             - secretRef:
                 name: dmb-secret
             - configMapRef:

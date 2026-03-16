@@ -2,24 +2,24 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: shared-postgres
+  name: postgres
 spec:
-  serviceName: shared-postgres-service
+  serviceName: postgres-service
   replicas: 1
   selector:
     matchLabels:
-      app: shared-postgres
+      app: postgres
   template:
     metadata:
       labels:
-        app: shared-postgres
+        app: postgres
     spec:
       containers:
         - name: postgres
           image: postgres:18-alpine
           envFrom:
             - secretRef:
-                name: shared-postgres-secret
+                name: postgres-secret
           env:
             - name: PGDATA
               value: /var/lib/postgresql/data/pgdata
@@ -33,7 +33,7 @@ spec:
       volumes:
         - name: postgres-data
           persistentVolumeClaim:
-            claimName: shared-postgres-pvc
+            claimName: postgres-pvc
         - name: init-script
           ConfigMap:
             name: postgres-init-script

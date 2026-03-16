@@ -24,7 +24,7 @@ smtp:
 
 # Database Configuration
 database:
-  host: "shared-postgres-service.shared-services.svc.cluster.local"
+  host: "postgres-service.databases.svc.cluster.local"
   port: 5432
   username: esl
   password: esl_db_pass
@@ -38,9 +38,9 @@ database:
 
 # Redis Configuration
 redis:
-  host: "shared-redis-service.shared-services.svc.cluster.local"
+  host: "redis-service.databases.svc.cluster.local"
   port: 6379
-  password: "nooblearn2code_redis_pass"
+  password: ""
   database: 0
   pool_size: 10
   min_idle_connections: 5

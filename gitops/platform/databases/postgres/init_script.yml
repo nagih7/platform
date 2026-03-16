@@ -1,0 +1,22 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-init-script
+data:
+  01-init.sh: |
+    # #!/bin/bash
+    # set -e # Exit immediately if a command fails
+    #
+    # echo "==> Bootstrapping Multiple Databases securely..."
+    #
+    # # We use psql to pass the environment variables directly into the database
+    # psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL
+    #     CREATE USER gitlab WITH PASSWORD '$GITLAB_DB_PASS';
+    #     CREATE DATABASE auth_db OWNER gitlab;
+    #
+    #     CREATE USER order_user WITH PASSWORD '$ORDER_DB_PASS';
+    #     CREATE DATABASE order_db OWNER order_user;
+    # EOSQL
+    #
+    # echo "==> Databases initialized successfully!"

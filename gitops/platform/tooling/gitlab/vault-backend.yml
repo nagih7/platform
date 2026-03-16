@@ -1,17 +1,22 @@
-apiVersion: external-secrets.io/v1beta1
-kind: ClusterSecretStore
+---
+apiVersion: v1
+kind: ServiceAccount
 metadata:
-  name: shared-services-vault-backend
+  name: tool-vault-sa
+---
+apiVersion: external-secrets.io/v1beta1
+kind: SecretStore
+metadata:
+  name: gitlab-vault-backend
 spec:
   provider:
     vault:
       server: "http://hashicorp-vault.vault.svc.cluster.local:8200"
-      path: "shared-services"
+      path: "platform"
       version: "v2"
       auth:
         kubernetes:
           mountPath: "kubernetes"
-          role: "shared-services-role"
+          role: "tool-role"
           serviceAccountRef:
-            name: "shared-services-vault-sa"
-            namespace: "vault"
+            name: "tool-vault-sa"

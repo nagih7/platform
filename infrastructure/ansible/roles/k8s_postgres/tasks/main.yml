@@ -1,0 +1,28 @@
+---
+- name: Postgres Init Databases
+  delegate_to: localhost
+  become: false
+  tags: k8s-postgres
+
+  block:
+    - name: Create Application Users and Databases
+      community.postgresql.postgresql_user:
+        name: "{{ item.user }}"
+        password: "{{ item.password }}"
+        login_host: "{{ hostvars[postgres_node]['ansible_host'] }}"
+        login_port: "32543"
+        login_user: "{{ postgres_root_user }}"
+        login_password: "{{ postgres_root_password }}"
+        state: present
+      loop: "{{ databases }}"
+
+    - name: Create PostgreSQL Databases
+      community.postgresql.postgresql_db:
+        name: "{{ item.name }}"
+        owner: "{{ item.user }}"
+        login_host: "{{ hostvars[postgres_node]['ansible_host'] }}"
+        login_port: "32543"
+        login_user: "{{ postgres_root_user }}"
+        login_password: "{{ postgres_root_password }}"
+        state: present
+      loop: "{{ databases }}"

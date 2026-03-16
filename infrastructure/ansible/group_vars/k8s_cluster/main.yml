@@ -1,18 +1,5 @@
 ---
 base_domain: nooblearn2code.com
 
-# Namespaces
-proxmox_namespace: proxmox
-shared_services_namespace: shared-services
-microservices_namespace: microservices
-argocd_namespace: argocd
-gitlab_namespace: gitlab
-seafile_namespace: seafile
-
-namespaces:
-  - "{{ proxmox_namespace }}"
-  - "{{ shared_services_namespace }}"
-  - "{{ microservices_namespace }}"
-  - "{{ argocd_namespace }}"
-  - "{{ gitlab_namespace }}"
-  - "{{ seafile_namespace }}"
+proxmox_ip: 100.118.35.55
+proxmox_dashboard_port: 8006

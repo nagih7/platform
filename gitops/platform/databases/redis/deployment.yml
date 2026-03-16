@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: shared-redis
+  name: redis
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: shared-redis
+      app: redis
   template:
     metadata:
       labels:
-        app: shared-redis
+        app: redis
     spec:
       containers:
         - name: redis
@@ -25,7 +25,7 @@ spec:
             ]
           envFrom:
             - secretRef:
-                name: shared-redis-secret
+                name: redis-secret
           ports:
             - containerPort: 6379
           volumeMounts:
@@ -34,4 +34,4 @@ spec:
       volumes:
         - name: redis-data
           persistentVolumeClaim:
-            claimName: shared-redis-pvc
+            claimName: redis-pvc

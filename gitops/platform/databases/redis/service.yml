@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: shared-redis-service
+  name: redis-service
 spec:
   selector:
-    app: shared-redis
+    app: redis
   ports:
     - port: 6379
       targetPort: 6379

@@ -36,14 +36,7 @@ spec:
                   policies=infra-policy \
                   ttl=1h
 
-              echo "==> Configuring Shared Services Role"
-              echo 'path "shared-services/data/*" { capabilities = ["read"] }' | vault policy write shared-services-policy -
-              vault write auth/kubernetes/role/shared-services-role \
-                  bound_service_account_names=shared-services-vault-sa \
-                  bound_service_account_namespaces=shared-services,vault,database,gitlab \
-                  policies=shared-services-policy \
-                  ttl=1h
-
+              echo "==> CONFIGURING WORKLOADS"
               echo "==> Configuring Microservices Role"
               echo 'path "workloads/data/microservices/*" { capabilities = ["read"] }' | vault policy write workloads-microservices-policy -
               vault write auth/kubernetes/role/microservices-role \
@@ -66,6 +59,23 @@ spec:
                   bound_service_account_names=third-party-vault-sa \
                   bound_service_account_namespaces=vaultwarden,seafile,discord-bots \
                   policies=workloads-third-party-policy \
+                  ttl=1h
+
+              echo "==> CONFIGURING PLATFORM"
+              echo "==> Configuring Databases Role"
+              echo 'path "platform/data/databases/*" { capabilities = ["read"] }' | vault policy write platform-databases-policy -
+              vault write auth/kubernetes/role/databases-role \
+                  bound_service_account_names=db-vault-sa \
+                  bound_service_account_namespaces=databases,postgres,redis \
+                  policies=platform-databases-policy \
+                  ttl=1h
+
+              echo "==> Configuring Tooling Role"
+              echo 'path "platform/data/tooling/*" { capabilities = ["read"] }' | vault policy write platform-tooling-policy -
+              vault write auth/kubernetes/role/tool-role \
+                  bound_service_account_names=tool-vault-sa \
+                  bound_service_account_namespaces=tooling,gitlab,runner \
+                  policies=platform-tooling-policy \
                   ttl=1h
 
           volumeMounts:

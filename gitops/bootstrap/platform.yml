@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: shared-services
+  name: platform
   namespace: argocd
 spec:
   generators:
@@ -9,7 +9,7 @@ spec:
         repoURL: "https://github.com/nagih7/platform.git"
         revision: main
         directories:
-          - path: gitops/shared_services/*
+          - path: gitops/platform/*
   template:
     metadata:
       name: "{{path.basename}}"
@@ -21,8 +21,10 @@ spec:
         path: "{{path}}"
       destination:
         server: "https://kubernetes.default.svc"
-        namespace: "shared-services"
+        namespace: "{{path.basename}}"
       syncPolicy:
         automated:
           prune: true
           selfHeal: true
+        syncOptions:
+          - CreateNamespace=true

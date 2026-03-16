@@ -30,3 +30,4 @@
   roles:
     - { role: k8s_bootstrap, tags: k8s-bootstrap }
     - { role: k8s_addons, tags: k8s-addons }
+    - { role: k8s_postgres, tags: k8s-postgres }
