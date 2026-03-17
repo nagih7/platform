@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: cloudflare
+  name: networking
   labels:
-    name: cloudflare
+    name: networking
     managed-by: argocd

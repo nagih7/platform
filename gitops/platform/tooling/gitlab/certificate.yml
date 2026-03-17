@@ -6,7 +6,7 @@ metadata:
 spec:
   secretName: gitlab-tls-secret
   issuerRef:
-    name: letsencrypt-prod
+    name: letsencrypt
     kind: ClusterIssuer
   dnsNames:
     - gitlab.nooblearn2code.com

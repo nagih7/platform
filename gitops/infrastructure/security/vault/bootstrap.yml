@@ -28,14 +28,6 @@ spec:
               vault auth enable kubernetes || true
               vault write auth/kubernetes/config kubernetes_host="https://kubernetes.default.svc"
 
-              echo "==> Configuring Infrastructure Role"
-              echo 'path "infrastructure/data/*" { capabilities = ["read"] }' | vault policy write infra-policy -
-              vault write auth/kubernetes/role/infra-role \
-                  bound_service_account_names=infra-vault-sa \
-                  bound_service_account_namespaces=cloudflare,infrastructure,vault,traefik \
-                  policies=infra-policy \
-                  ttl=1h
-
               echo "==> CONFIGURING WORKLOADS"
               echo "==> Configuring Microservices Role"
               echo 'path "workloads/data/microservices/*" { capabilities = ["read"] }' | vault policy write workloads-microservices-policy -
@@ -76,6 +68,31 @@ spec:
                   bound_service_account_names=tool-vault-sa \
                   bound_service_account_namespaces=tooling,gitlab,runner \
                   policies=platform-tooling-policy \
+                  ttl=1h
+
+              echo "==> CONFIGURING INFRASTRUCTURE"
+              echo "==> Configuring Storage Role"
+              echo 'path "infrastructure/data/storage/*" { capabilities = ["read"] }' | vault policy write infrastructure-storage-policy -
+              vault write auth/kubernetes/role/storage-role \
+                  bound_service_account_names=storage-vault-sa \
+                  bound_service_account_namespaces=storage \
+                  policies=infrastructure-storage-policy \
+                  ttl=1h
+
+              echo "==> Configuring Networking Role"
+              echo 'path "infrastructure/data/networking/*" { capabilities = ["read"] }' | vault policy write infrastructure-networking-policy -
+              vault write auth/kubernetes/role/networking-role \
+                  bound_service_account_names=net-vault-sa \
+                  bound_service_account_namespaces=networking,cloudflare,traefik \
+                  policies=infrastructure-networking-policy \
+                  ttl=1h
+
+              echo "==> Configuring Security Role"
+              echo 'path "infrastructure/data/security/*" { capabilities = ["read"] }' | vault policy write infrastructure-security-policy -
+              vault write auth/kubernetes/role/security-role \
+                  bound_service_account_names=sec-vault-sa \
+                  bound_service_account_namespaces=security \
+                  policies=infrastructure-security-policy \
                   ttl=1h
 
           volumeMounts:

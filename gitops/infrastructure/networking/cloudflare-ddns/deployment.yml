@@ -20,7 +20,7 @@ spec:
           imagePullPolicy: IfNotPresent
           envFrom:
             - secretRef:
-                name: cloudflare-ddns-secret
+                name: cf-ddns-secret
           env:
             - name: ZONE
               value: "nooblearn2code.com"

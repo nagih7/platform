@@ -1,7 +1,15 @@
-apiVersion: external-secrets.io/v1beta1
-kind: ClusterSecretStore
+---
+apiVersion: v1
+kind: ServiceAccount
 metadata:
-  name: infra-vault-backend
+  name: net-vault-sa
+  namespace: traefik
+---
+apiVersion: external-secrets.io/v1beta1
+kind: SecretStore
+metadata:
+  name: traefik-vault-backend
+  namespace: traefik
 spec:
   provider:
     vault:
@@ -11,7 +19,6 @@ spec:
       auth:
         kubernetes:
           mountPath: "kubernetes"
-          role: "infra-role"
+          role: "networking-role"
           serviceAccountRef:
-            name: "infra-vault-sa"
-            namespace: "vault"
+            name: "net-vault-sa"
