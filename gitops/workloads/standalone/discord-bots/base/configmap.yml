@@ -4,6 +4,7 @@ metadata:
   name: music-bot-config
 data:
   VERSION: "2.0.0"
+  USE_DATABASE: "true"
   PLAYLIST_DIR: "./playlist"
   STAY_CONNECTED_24_7: "true"
   LOG_LEVEL: "INFO"
