@@ -4,7 +4,7 @@ metadata:
   name: vault-bootstrap
   namespace: vault
   annotations:
-    argocd.argoproj.io/sync-options: Replace=true
+    argocd.argoproj.io/sync-options: Replace=true,Force=true
     argocd.argoproj.io/hook: Sync
     argocd.argoproj.io/hook-delete-policy: HookSucceeded
 spec:
@@ -18,86 +18,13 @@ spec:
           image: hashicorp/vault:1.15
           command:
             - "sh"
-            - "-c"
-            - |
-              set -e
-              export VAULT_ADDR="http://hashicorp-vault.vault.svc.cluster.local:8200"
-              export VAULT_TOKEN=$(cat /vault/secrets/root-token)
-
-              echo "==> Configuring Vault..."
-              vault auth enable kubernetes || true
-              vault write auth/kubernetes/config kubernetes_host="https://kubernetes.default.svc"
-
-              echo "==> CONFIGURING WORKLOADS"
-              echo "==> Configuring Microservices Role"
-              echo 'path "workloads/data/microservices/*" { capabilities = ["read"] }' | vault policy write workloads-microservices-policy -
-              vault write auth/kubernetes/role/microservices-role \
-                  bound_service_account_names=ms-vault-sa \
-                  bound_service_account_namespaces=microservices \
-                  policies=workloads-microservices-policy \
-                  ttl=1h
-
-              echo "==> Configuring Standalone Role"
-              echo 'path "workloads/data/standalone/*" { capabilities = ["read"] }' | vault policy write workloads-standalone-policy -
-              vault write auth/kubernetes/role/standalone-role \
-                  bound_service_account_names=standalone-vault-sa \
-                  bound_service_account_namespaces=discord-bots \
-                  policies=workloads-standalone-policy \
-                  ttl=1h
-
-              echo "==> Configuring Third-Party Role"
-              echo 'path "workloads/data/third-party/*" { capabilities = ["read"] }' | vault policy write workloads-third-party-policy -
-              vault write auth/kubernetes/role/third-party-role \
-                  bound_service_account_names=third-party-vault-sa \
-                  bound_service_account_namespaces=vaultwarden,seafile,discord-bots \
-                  policies=workloads-third-party-policy \
-                  ttl=1h
-
-              echo "==> CONFIGURING PLATFORM"
-              echo "==> Configuring Databases Role"
-              echo 'path "platform/data/databases/*" { capabilities = ["read"] }' | vault policy write platform-databases-policy -
-              vault write auth/kubernetes/role/databases-role \
-                  bound_service_account_names=db-vault-sa \
-                  bound_service_account_namespaces=databases,postgres,redis \
-                  policies=platform-databases-policy \
-                  ttl=1h
-
-              echo "==> Configuring Tooling Role"
-              echo 'path "platform/data/tooling/*" { capabilities = ["read"] }' | vault policy write platform-tooling-policy -
-              vault write auth/kubernetes/role/tool-role \
-                  bound_service_account_names=tool-vault-sa \
-                  bound_service_account_namespaces=tooling,gitlab,runner \
-                  policies=platform-tooling-policy \
-                  ttl=1h
-
-              echo "==> CONFIGURING INFRASTRUCTURE"
-              echo "==> Configuring Storage Role"
-              echo 'path "infrastructure/data/storage/*" { capabilities = ["read"] }' | vault policy write infrastructure-storage-policy -
-              vault write auth/kubernetes/role/storage-role \
-                  bound_service_account_names=storage-vault-sa \
-                  bound_service_account_namespaces=storage \
-                  policies=infrastructure-storage-policy \
-                  ttl=1h
-
-              echo "==> Configuring Networking Role"
-              echo 'path "infrastructure/data/networking/*" { capabilities = ["read"] }' | vault policy write infrastructure-networking-policy -
-              vault write auth/kubernetes/role/networking-role \
-                  bound_service_account_names=net-vault-sa \
-                  bound_service_account_namespaces=networking,cloudflare,traefik \
-                  policies=infrastructure-networking-policy \
-                  ttl=1h
-
-              echo "==> Configuring Security Role"
-              echo 'path "infrastructure/data/security/*" { capabilities = ["read"] }' | vault policy write infrastructure-security-policy -
-              vault write auth/kubernetes/role/security-role \
-                  bound_service_account_names=sec-vault-sa \
-                  bound_service_account_namespaces=security \
-                  policies=infrastructure-security-policy \
-                  ttl=1h
-
+            - "/scripts/bootstrap.sh"
           volumeMounts:
             - name: vault-root-token
               mountPath: /vault/secrets
+              readOnly: true
+            - name: bootstrap-script
+              mountPath: /scripts
               readOnly: true
 
       containers:
@@ -119,4 +46,9 @@ spec:
             items:
               - key: root-token
                 path: root-token
+        - name: bootstrap-script
+          configMap:
+            name: vault-bootstrap-script
+            defaultMode: 0755
+
       restartPolicy: Never
