@@ -12,3 +12,6 @@ spec:
     - name: ssh
       port: 22
       targetPort: 22
+    - name: workhorse
+      port: 8181
+      targetPort: 8181

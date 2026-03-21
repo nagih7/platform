@@ -1,4 +1,3 @@
----
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -12,17 +11,29 @@ spec:
     targetRevision: 0.86.0
     helm:
       values: |
-        gitlabUrl: "https://gitlab.nooblearn2code.com"
+        gitlabUrl: "http://gitlab-service.gitlab.svc.cluster.local"
         runnerToken: "glrt-ByuiPxE5MCSuSxLxxgy5"
         rbac:
           create: true
         runners:
           config: |
             [[runners]]
+            clone_url = "http://gitlab-service.gitlab.svc.cluster.local"
+              
+              environment = [
+                "CI_SERVER_URL=http://gitlab-service.gitlab.svc.cluster.local" 
+              ]
+
               [runners.kubernetes]
                 namespace = "gitlab"
                 image = "ubuntu:22.04"
                 privileged = true
+                
+              [runners.custom_build_dir]
+              [runners.cache]
+              [runners.machine]
+              [runners.kubernetes.pod_labels]
+              [runners.kubernetes.pod_annotations]
   destination:
     server: "https://kubernetes.default.svc"
     namespace: gitlab

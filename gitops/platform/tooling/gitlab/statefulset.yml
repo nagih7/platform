@@ -15,6 +15,18 @@ spec:
     spec:
       nodeSelector:
         kubernetes.io/hostname: k8s-worker-1
+      initContainers:
+        - name: fix-permissions
+          image: busybox
+          command:
+            - sh
+            - -c
+            - |
+              chown -R 998:998 /var/opt/gitlab
+              chmod -R 755 /var/opt/gitlab/gitlab-ci
+          volumeMounts:
+            - name: gitlab-data
+              mountPath: /var/opt/gitlab
       containers:
         - name: gitlab
           image: gitlab/gitlab-ce:16.11.0-ce.0
