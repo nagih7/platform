@@ -27,7 +27,7 @@ spec:
               [runners.kubernetes]
                 namespace = "gitlab"
                 image = "ubuntu:22.04"
-                privileged = true
+                privileged = false
                 
               [runners.custom_build_dir]
               [runners.cache]

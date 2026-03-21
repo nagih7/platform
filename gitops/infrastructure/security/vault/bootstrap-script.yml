@@ -13,12 +13,10 @@ data:
 
     echo "==> Configuring Vault..."
 
-    # ── Kubernetes Auth ─────────────────────────────────────────────
     vault auth enable kubernetes || true
     vault write auth/kubernetes/config \
       kubernetes_host="https://kubernetes.default.svc"
 
-    # ── JWT Auth for GitLab CI ──────────────────────────────────────
     echo "==> Enabling JWT auth for GitLab CI..."
     vault auth enable jwt || true
 
@@ -26,27 +24,16 @@ data:
       jwks_url="https://gitlab.nooblearn2code.com/-/jwks" \
       bound_issuer="https://gitlab.nooblearn2code.com"
 
-    printf 'path "cicd/data/docker" { capabilities = ["read"] }' \
+    printf 'path "cicd/data/docker" { capabilities = ["read"] }\npath "cicd/data/github" { capabilities = ["read"] }' \
       | vault policy write ci-build-policy -
 
-    cat > /tmp/ci-build-role.json << 'ENDJSON'
-    {
-      "role_type": "jwt",
-      "bound_audiences": ["https://gitlab.nooblearn2code.com"],
-      "user_claim": "sub",
-      "bound_claims": {
-        "project_path": ["nagih7/platform", "nagih7/auth-service", "nagih7/esl-service", "nagih7/esl-web"]
-      },
-      "policies": ["ci-build-policy"],
-      "ttl": "1h"
-    }
-    ENDJSON
+    printf '{\n  "role_type": "jwt",\n  "bound_audiences": ["https://gitlab.nooblearn2code.com"],\n  "user_claim": "sub",\n  "bound_claims_type": "glob",\n  "bound_claims": {"project_path": ["microservices/*"]},\n  "policies": ["ci-build-policy"],\n  "ttl": "1h"\n}' \
+      > /tmp/ci-build-role.json
 
     vault write auth/jwt/role/ci-build-role @/tmp/ci-build-role.json
 
     echo "========================================================"
 
-    # ── WORKLOADS ───────────────────────────────────────────────────
     echo "==> Configuring Microservices Role"
     printf 'path "workloads/data/microservices/*" { capabilities = ["read"] }' \
       | vault policy write workloads-microservices-policy -
@@ -74,7 +61,6 @@ data:
       policies=workloads-third-party-policy \
       ttl=1h
 
-    # ── PLATFORM ────────────────────────────────────────────────────
     echo "==> Configuring Databases Role"
     printf 'path "platform/data/databases/*" { capabilities = ["read"] }' \
       | vault policy write platform-databases-policy -
@@ -93,7 +79,6 @@ data:
       policies=platform-tooling-policy \
       ttl=1h
 
-    # ── INFRASTRUCTURE ───────────────────────────────────────────────
     echo "==> Configuring Storage Role"
     printf 'path "infrastructure/data/storage/*" { capabilities = ["read"] }' \
       | vault policy write infrastructure-storage-policy -
