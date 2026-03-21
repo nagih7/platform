@@ -4,5 +4,11 @@ resources:
   - helm.yml
   - ingress.yml
   - rbac.yml
-  - bootstrap-script.yml
+  - bootstrap-scripts/main.yml
+  - bootstrap-scripts/auth-methods.yml
+  - bootstrap-scripts/ci-policy.yml
+  - bootstrap-scripts/workloads.yml
+  - bootstrap-scripts/platform.yml
+  - bootstrap-scripts/infrastructure.yml
+  - bootstrap-scripts/access.yml
   - bootstrap.yml

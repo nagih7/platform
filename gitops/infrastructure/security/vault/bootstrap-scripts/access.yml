@@ -1,0 +1,169 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vault-bootstrap-access
+  namespace: vault
+data:
+  access.sh: |
+    #!/bin/sh
+    set -e
+    echo "==> [06] Configuring Developer Access..."
+
+    # ── Helper: create user only if not exists ────────────────
+    append_to_password_policy() {
+      USERNAME=$1
+
+      # Build policy with all current users
+      USERS=$(vault list -format=json auth/userpass/users \
+        | tr -d '[]"' | tr ',' '\n' | tr -d ' ')
+
+      POLICY_CONTENT=""
+      for USER in $USERS; do
+        POLICY_CONTENT="${POLICY_CONTENT}path \"auth/userpass/users/${USER}/password\" { capabilities = [\"update\"] }\n"
+      done
+
+      # Add base permissions
+      POLICY_CONTENT="${POLICY_CONTENT}path \"identity/entity/id\" { capabilities = [\"list\"] }\n"
+      POLICY_CONTENT="${POLICY_CONTENT}path \"identity/entity/id/*\" { capabilities = [\"read\"] }\n"
+      POLICY_CONTENT="${POLICY_CONTENT}path \"auth/token/lookup-self\" { capabilities = [\"read\"] }\n"
+      POLICY_CONTENT="${POLICY_CONTENT}path \"auth/token/renew-self\" { capabilities = [\"update\"] }\n"
+      POLICY_CONTENT="${POLICY_CONTENT}path \"sys/capabilities-self\" { capabilities = [\"update\"] }"
+
+      printf "${POLICY_CONTENT}" | vault policy write must-change-password -
+      echo "✅ Updated must-change-password policy with user ${USERNAME}"
+    }
+
+    create_user_if_not_exists() {
+      USERNAME=$1
+      PASSWORD=$2
+
+      if vault read auth/userpass/users/${USERNAME} > /dev/null 2>&1; then
+        echo "⏭️  User ${USERNAME} exists — keeping password"
+      else
+        echo "➕ Creating user ${USERNAME}"
+        vault write auth/userpass/users/${USERNAME} \
+          password="${PASSWORD}" \
+          policies="must-change-password"
+        append_to_password_policy "${USERNAME}"
+      fi
+    }
+
+    # ── Helper: create entity only if not exists ──────────────
+    create_entity_if_not_exists() {
+      NAME=$1
+      if vault read identity/entity/name/${NAME} > /dev/null 2>&1; then
+        echo "⏭️  Entity ${NAME} exists — skipping"
+      else
+        echo "➕ Creating entity ${NAME}"
+        vault write identity/entity name="${NAME}"
+      fi
+    }
+
+    # ── Helper: create group only if not exists ───────────────
+    create_group_if_not_exists() {
+      GROUP=$1
+      POLICY=$2
+      ENTITY_ID=$3
+      if vault read identity/group/name/${GROUP} > /dev/null 2>&1; then
+        echo "⏭️  Group ${GROUP} exists — skipping"
+      else
+        echo "➕ Creating group ${GROUP}"
+        vault write identity/group \
+          name="${GROUP}" \
+          type="internal" \
+          policies="${POLICY}" \
+          member_entity_ids="${ENTITY_ID}"
+      fi
+    }
+
+    # ── Helper: create entity alias only if not exists ────────
+    create_alias_if_not_exists() {
+      NAME=$1
+      ENTITY_ID=$2
+      ACCESSOR=$3
+      if vault list identity/entity-alias > /dev/null 2>&1; then
+        EXISTING=$(vault read -format=json identity/entity/name/${NAME} \
+          | grep '"aliases"' || true)
+        if [ -n "$EXISTING" ]; then
+          echo "⏭️  Alias ${NAME} exists — skipping"
+          return
+        fi
+      fi
+      echo "➕ Creating alias ${NAME}"
+      vault write identity/entity-alias \
+        name="${NAME}" \
+        canonical_id="${ENTITY_ID}" \
+        mount_accessor="${ACCESSOR}"
+    }
+
+    get_entity_id() {
+      NAME=$1
+      vault read -format=json identity/entity/name/${NAME} \
+        | tr ',' '\n' \
+        | grep '"id"' \
+        | grep -v 'namespace_id\|request_id\|accessor_id\|metadata' \
+        | head -1 \
+        | cut -d'"' -f4
+    }
+
+    # ── Policies (always re-apply — idempotent) ───────────────
+    printf 'path "auth/userpass/users/+/password" { capabilities = ["update"] }' \
+      | vault policy write must-change-password -
+     
+    printf 'path "*" { capabilities = ["create","read","update","delete","list"] }\npath "*" { capabilities = ["list","read","delete"] }' \
+      | vault policy write admin-policy -
+
+    printf 'path "workloads/data/microservices/auth-service/*" { capabilities = ["create","read","update","delete","list"] }\npath "workloads/metadata/microservices/auth-service/*" { capabilities = ["list","read","delete"] }' \
+      | vault policy write auth-policy -
+
+    printf 'path "workloads/data/microservices/resumind/*" { capabilities = ["create","read","update","delete","list"] }\npath "workloads/metadata/microservices/resumind/*" { capabilities = ["list","read","delete"] }' \
+      | vault policy write resumind-policy -
+
+    printf 'path "workloads/data/microservices/uniquizz/*" { capabilities = ["create","read","update","delete","list"] }\npath "workloads/metadata/microservices/uniquizz/*" { capabilities = ["list","read","delete"] }' \
+      | vault policy write uniquizz-policy -
+
+
+    # ── Users ─────────────────────────────────────────────────
+    create_user_if_not_exists "nagih"        "change-me-now"
+    create_user_if_not_exists "hoanggxyuuki" "change-me-now"
+    create_user_if_not_exists "lucastran05" "change-me-now"
+
+    # ── Get userpass accessor ─────────────────────────────────
+    USERPASS_ACCESSOR=$(vault read -field=accessor sys/auth/userpass)
+    echo "Userpass accessor: ${USERPASS_ACCESSOR}"
+
+    if [ -z "${USERPASS_ACCESSOR}" ]; then
+      echo "❌ Could not get userpass accessor"
+      exit 1
+    fi
+
+    # ── Entities ──────────────────────────────────────────────
+    create_entity_if_not_exists "nagih"
+    create_entity_if_not_exists "hoanggxyuuki"
+    create_entity_if_not_exists "lucastran05"
+
+    NAGIH_ID=$(vault read -field=id identity/entity/name/nagih)
+    HOANGGXYUUKI_ID=$(vault read -field=id identity/entity/name/hoanggxyuuki)
+    LUCASTRAN05_ID=$(vault read -field=id identity/entity/name/lucastran05)
+
+    echo "Entity IDs:"
+    echo "  nagih:        ${NAGIH_ID}"
+    echo "  hoanggxyuuki: ${HOANGGXYUUKI_ID}"
+
+    if [ -z "${NAGIH_ID}" ] || [ -z "${HOANGGXYUUKI_ID}" ]; then
+      echo "❌ Entity ID empty — aborting"
+      exit 1
+    fi
+
+    # ── Entity aliases ────────────────────────────────────────
+    create_alias_if_not_exists "nagih"          "${NAGIH_ID}"        "${USERPASS_ACCESSOR}"
+    create_alias_if_not_exists "hoanggxyuuki"   "${HOANGGXYUUKI_ID}" "${USERPASS_ACCESSOR}"
+    create_alias_if_not_exists "lucastran05"    "${LUCASTRAN05_ID}"  "${USERPASS_ACCESSOR}"
+
+    # ── Groups ────────────────────────────────────────────────
+    create_group_if_not_exists "admin"              "admin-policy"      "${NAGIH}"
+    create_group_if_not_exists "auth-group"         "auth-policy"       ""
+    create_group_if_not_exists "resumind-group"     "resumind-policy"   "${HOANGGXYUUKI}"
+    create_group_if_not_exists "uniquizz-group"     "uniquizz-policy"   "${LUCASTRAN05}"
+
+    echo "==> [06] ✅ Access Done"

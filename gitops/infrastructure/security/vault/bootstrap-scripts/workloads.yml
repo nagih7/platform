@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vault-bootstrap-workloads
+  namespace: vault
+data:
+  workloads.sh: |
+    #!/bin/sh
+    set -e
+    echo "==> [03] Configuring Workload Roles..."
+
+    printf 'path "workloads/data/microservices/*" { capabilities = ["read"] }' \
+      | vault policy write workloads-microservices-policy -
+    vault write auth/kubernetes/role/microservices-role \
+      bound_service_account_names=ms-vault-sa \
+      bound_service_account_namespaces=microservices \
+      policies=workloads-microservices-policy \
+      ttl=1h
+
+    printf 'path "workloads/data/standalone/*" { capabilities = ["read"] }' \
+      | vault policy write workloads-standalone-policy -
+    vault write auth/kubernetes/role/standalone-role \
+      bound_service_account_names=standalone-vault-sa \
+      bound_service_account_namespaces=discord-bots \
+      policies=workloads-standalone-policy \
+      ttl=1h
+
+    printf 'path "workloads/data/third-party/*" { capabilities = ["read"] }' \
+      | vault policy write workloads-third-party-policy -
+    vault write auth/kubernetes/role/third-party-role \
+      bound_service_account_names=third-party-vault-sa \
+      bound_service_account_namespaces=vaultwarden,seafile,discord-bots \
+      policies=workloads-third-party-policy \
+      ttl=1h
+
+    echo "==> [03] ✅ Workload Roles Done"

@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vault-bootstrap-infrastructure
+  namespace: vault
+data:
+  infrastructure.sh: |
+    #!/bin/sh
+    set -e
+    echo "==> [05] Configuring Infrastructure Roles..."
+
+    printf 'path "infrastructure/data/storage/*" { capabilities = ["read"] }' \
+      | vault policy write infrastructure-storage-policy -
+    vault write auth/kubernetes/role/storage-role \
+      bound_service_account_names=storage-vault-sa \
+      bound_service_account_namespaces=storage \
+      policies=infrastructure-storage-policy \
+      ttl=1h
+
+    printf 'path "infrastructure/data/networking/*" { capabilities = ["read"] }' \
+      | vault policy write infrastructure-networking-policy -
+    vault write auth/kubernetes/role/networking-role \
+      bound_service_account_names=net-vault-sa \
+      bound_service_account_namespaces=networking,cloudflare,traefik \
+      policies=infrastructure-networking-policy \
+      ttl=1h
+
+    printf 'path "infrastructure/data/security/*" { capabilities = ["read"] }' \
+      | vault policy write infrastructure-security-policy -
+    vault write auth/kubernetes/role/security-role \
+      bound_service_account_names=sec-vault-sa \
+      bound_service_account_namespaces=security \
+      policies=infrastructure-security-policy \
+      ttl=1h
+
+    echo "==> [05] ✅ Infrastructure Roles Done"
