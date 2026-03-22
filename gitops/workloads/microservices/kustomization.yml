@@ -4,6 +4,7 @@ namespace: microservices
 
 resources:
   - vault-backend.yml
+  - landing
   - auth-service
   - esl-service
   - esl-web

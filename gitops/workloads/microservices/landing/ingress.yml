@@ -1,0 +1,13 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: landing-ingress
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`nooblearn2code.com`)
+      kind: Rule
+      services:
+        - name: landing-svc
+          port: 80

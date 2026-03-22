@@ -5,13 +5,12 @@ resources:
   - deployment.yml
   - service.yml
   - ingress.yml
-  - external-secret.yml
 
 commonLabels:
-  app: resumind
-  tier: frontend
+  app: landing
+  tier: frontent
 
 images:
-  - name: nooblearn2code/resumind
-    newName: nooblearn2code/resumind
-    newTag: 007f69b3
+  - name: nooblearn2code/landing
+    newName: nooblearn2code/landing
+    newTag: latest
