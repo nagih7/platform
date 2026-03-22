@@ -1,0 +1,42 @@
+.debug_vault_template:
+  stage: debug
+  tags:
+    - k8s
+  image: docker:26-cli
+  id_tokens:
+    VAULT_ID_TOKEN:
+      aud: "https://gitlab.nooblearn2code.com"
+  script:
+    - apk add --no-cache curl jq
+
+    - echo "=== Decoded JWT Claims ==="
+    - |
+      PAYLOAD=$(echo "$VAULT_ID_TOKEN" | cut -d'.' -f2)
+      # Fix base64 padding
+      PADDED="${PAYLOAD}=="
+      echo "$PADDED" | base64 -d 2>/dev/null | jq '{
+        project_path: .project_path,
+        namespace_path: .namespace_path,
+        ref: .ref,
+        sub: .sub,
+        aud: .aud,
+        iss: .iss
+      }'
+
+    - echo "=== Vault Health Check ==="
+    - |
+      curl -s "${VAULT_ADDR}/v1/sys/health" | jq '{
+        initialized,
+        sealed,
+        standby,
+        active_time
+      }'
+
+    - echo "=== JWT Login Attempt ==="
+    - |
+      RESP=$(curl -s \
+        --request POST \
+        --header "Content-Type: application/json" \
+        --data "{\"role\":\"ci-build-role\",\"jwt\":\"${VAULT_ID_TOKEN}\"}" \
+        "${VAULT_ADDR}/v1/auth/jwt/login")
+      echo "$RESP" | jq .

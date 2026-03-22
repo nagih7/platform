@@ -24,6 +24,6 @@ resource "vault_jwt_auth_backend_role" "ci_build" {
   user_claim        = "sub"
   bound_claims_type = "glob"
   bound_claims = {
-    project_path = "microservices/*"
+    project_path = "microservices/**"
   }
 }

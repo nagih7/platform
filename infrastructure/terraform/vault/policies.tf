@@ -1,3 +1,13 @@
+# ── Terraform-specific Policy ─────────────────────────────────
+resource "vault_policy" "terraform_operator" {
+  name   = "terraform-operator"
+  policy = <<-EOT
+    path "sys/mounts/*"          { capabilities = ["create", "read", "update", "delete"] }
+    path "auth/*"                { capabilities = ["create", "read", "update", "delete"] }
+    path "sys/policies/*"        { capabilities = ["create", "read", "update", "delete"] }
+  EOT
+}
+
 # ── Admin Policies ───────────────────────────────────────────
 resource "vault_policy" "admin" {
   name = "admin-policy"
@@ -76,6 +86,14 @@ resource "vault_policy" "platform_tooling" {
 }
 
 # ── Workload Policies ────────────────────────────────────────
+resource "vault_policy" "workloads" {
+  name = "workloads-policy"
+
+  policy = <<-EOT
+    path "workloads/data/*" { capabilities = ["read"] }
+  EOT
+}
+
 resource "vault_policy" "workloads_microservices" {
   name = "workloads-microservices-policy"
 
@@ -106,12 +124,15 @@ resource "vault_policy" "workloads_third_party" {
   EOT
 }
 
-# ── Terraform-specific Policy ─────────────────────────────────
-resource "vault_policy" "terraform_operator" {
-  name   = "terraform-operator"
+# ── Resumind Policies ──────────────────────────────────────
+resource "vault_policy" "workloads_microservices_resumind" {
+  name = "resumind-policy"
+
   policy = <<-EOT
-    path "sys/mounts/*"          { capabilities = ["create", "read", "update", "delete"] }
-    path "auth/*"                { capabilities = ["create", "read", "update", "delete"] }
-    path "sys/policies/*"        { capabilities = ["create", "read", "update", "delete"] }
+    path "workloads/metadata/" { capabilities = ["list"] }
+    path "workloads/metadata/microservices/" { capabilities = ["list"] }
+    path "workloads/metadata/microservices/resumind/" { capabilities = ["list"] }
+    path "workloads/data/microservices/resumind" { capabilities = ["create", "read", "update", "delete", "list"] }
   EOT
 }
+

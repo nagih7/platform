@@ -3,3 +3,5 @@ kind: Kustomization
 resources:
   - helm.yml
   - ingress.yml
+  - network-policy.yml
+  - rbac.yml

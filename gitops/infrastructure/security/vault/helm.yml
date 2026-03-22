@@ -1,4 +1,4 @@
----
+# gitops/infrastructure/security/vault/helm.yml
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -12,6 +12,8 @@ spec:
     targetRevision: 0.27.0
     helm:
       values: |
+        injector:
+          enabled: false
         server:
           affinity: null
           dev:
@@ -21,6 +23,16 @@ spec:
           dataStorage:
             enabled: true
             size: 1Gi
+
+          authDelegator:
+            enabled: true
+
+          service:
+            active:
+              enabled: true
+            standby:
+              enabled: true
+
           ha:
             enabled: true
             replicas: 3
@@ -29,6 +41,7 @@ spec:
               setNodeId: true
               config: |
                 ui = true
+                api_addr = "https://vault.nooblearn2code.com"
                 listener "tcp" {
                   tls_disable = 1
                   address = "[::]:8200"
@@ -36,6 +49,15 @@ spec:
                 }
                 storage "raft" {
                   path = "/vault/data"
+                  retry_join {
+                    leader_api_addr = "http://hashicorp-vault-0.hashicorp-vault-internal:8200"
+                  }
+                  retry_join {
+                    leader_api_addr = "http://hashicorp-vault-1.hashicorp-vault-internal:8200"
+                  }
+                  retry_join {
+                    leader_api_addr = "http://hashicorp-vault-2.hashicorp-vault-internal:8200"
+                  }
                 }
   destination:
     server: "https://kubernetes.default.svc"

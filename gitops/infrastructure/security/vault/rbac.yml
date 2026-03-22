@@ -1,0 +1,61 @@
+# gitops/infrastructure/security/vault/rbac.yml
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: vault-admin-sa
+  namespace: vault
+
+---
+# ── Allow Vault pods to update their own labels ──────────────
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: vault-active-labeler
+  namespace: vault
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "update", "patch", "list", "watch"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: vault-active-labeler-binding
+  namespace: vault
+subjects:
+  - kind: ServiceAccount
+    name: hashicorp-vault # Vault's own SA created by Helm
+    namespace: vault
+roleRef:
+  kind: Role
+  name: vault-active-labeler
+  apiGroup: rbac.authorization.k8s.io
+
+---
+# Keep old one for bootstrap job cleanup
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: vault-secret-destroyer
+  namespace: vault
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get", "delete"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: vault-admin-sa-binding
+  namespace: vault
+subjects:
+  - kind: ServiceAccount
+    name: vault-admin-sa
+    namespace: vault
+roleRef:
+  kind: Role
+  name: vault-secret-destroyer
+  apiGroup: rbac.authorization.k8s.io
