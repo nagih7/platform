@@ -1,17 +1,17 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - configmap.yml
-  - deployment.yml
-  - service.yml
-  - ingress.yml
-  - external-secret.yml
+- configmap.yml
+- deployment.yml
+- service.yml
+- ingress.yml
+- external-secret.yml
 
 commonLabels:
   app: auth-service
   tier: backend
 
 images:
-  - name: nooblearn2code/auth-service
-    newName: nooblearn2code/auth-service
-    newTag: latest
+- name: nooblearn2code/auth-service
+  newName: nooblearn2code/auth-service
+  newTag: 49d7f8ba
