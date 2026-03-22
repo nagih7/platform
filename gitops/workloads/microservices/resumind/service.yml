@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: resumind-svc
+spec:
+  selector:
+    app: resumind
+  ports:
+    - port: 80
+      targetPort: 3000

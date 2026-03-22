@@ -7,3 +7,4 @@ resources:
   - auth-service
   - esl-service
   - esl-web
+  - resumind
