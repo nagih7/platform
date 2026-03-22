@@ -9,6 +9,20 @@ resource "vault_policy" "admin" {
   EOT
 }
 
+# ── CI Policies ───────────────────────────────────────────
+resource "vault_policy" "ci_build" {
+  name = "ci-build-policy"
+
+  policy = <<-EOT
+    path "cicd/data/docker" {
+      capabilities = ["read"]
+    }
+    path "cicd/data/github" {
+      capabilities = ["read"]
+    }
+  EOT
+}
+
 # ── Infrastructure Policies ──────────────────────────────────
 resource "vault_policy" "infrastructure_networking" {
   name = "infrastructure-networking-policy"

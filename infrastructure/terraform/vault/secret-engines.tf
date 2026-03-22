@@ -1,3 +1,14 @@
+resource "vault_mount" "cicd_kv" {
+  path        = "cicd"
+  type        = "kv"
+  options     = { version = "2" }
+  description = "CI/CD secrets (docker credentials, github tokens)"
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
 # ── Infrastructure Tier ──────────────────────────────────────
 resource "vault_mount" "infrastructure_kv" {
   path        = "infrastructure"
