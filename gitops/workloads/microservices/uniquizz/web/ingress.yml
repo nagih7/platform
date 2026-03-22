@@ -1,0 +1,13 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: uniquizz-web-ingress
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`uniquizz.nooblearn2code.com`)
+      kind: Rule
+      services:
+        - name: uniquizz-web-svc
+          port: 80

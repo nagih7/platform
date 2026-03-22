@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: uniquizz-web-svc
+spec:
+  selector:
+    app: resumind
+  ports:
+    - port: 80
+      targetPort: 4173
