@@ -1,7 +1,7 @@
 resource "vault_identity_group" "admin" {
   name     = "admin"
   type     = "internal"
-  policies = [vault_policy.terraform_operator.name]
+  policies = [vault_policy.admin.name]
 
   member_entity_ids = [
     vault_identity_entity.nagih.id
@@ -16,6 +16,8 @@ resource "vault_identity_group" "resumind" {
   name = "resumind"
   type = "internal"
   policies = [
+    vault_policy.workloads.name,
+    vault_policy.workloads_microservices.name,
     vault_policy.workloads_microservices_resumind.name
   ]
 
@@ -28,18 +30,21 @@ resource "vault_identity_group" "resumind" {
   }
 }
 
+resource "vault_identity_group" "uniquizz" {
+  name = "uniquizz"
+  type = "internal"
+  policies = [
+    vault_policy.workloads.name,
+    vault_policy.workloads_microservices.name,
+    vault_policy.workloads_microservices_uniquizz.name
+  ]
 
+  member_entity_ids = [
+    vault_identity_entity.nghuytan.id,
+    vault_identity_entity.lucastran05.id
+  ]
 
-# resource "vault_identity_group" "developers" {
-#   name = "developers"
-#   type = "internal"
-#   policies = [
-#     vault_policy.workloads_microservices.name,
-#     vault_policy.platform_databases.name,
-#     vault_policy.platform_tooling.name,
-#   ]
-#
-#   metadata = {
-#     description = "Application developers - read workloads and platform"
-#   }
-# }
+  metadata = {
+    description = "Uniquizz administrators"
+  }
+}

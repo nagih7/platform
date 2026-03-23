@@ -3,14 +3,28 @@ data "vault_auth_backend" "userpass" {
 }
 
 resource "vault_identity_entity_alias" "nagih_userpass" {
-  name           = "nagih" # must match the userpass username exactly
+  name           = "nagih"
   mount_accessor = data.vault_auth_backend.userpass.accessor
   canonical_id   = vault_identity_entity.nagih.id
 }
 
 resource "vault_identity_entity_alias" "hoanggxyuuki_userpass" {
-  name           = "hoanggxyuuki" # must match the userpass username exactly
+  name           = "hoanggxyuuki"
   mount_accessor = data.vault_auth_backend.userpass.accessor
   canonical_id   = vault_identity_entity.hoanggxyuuki.id
 }
+
+resource "vault_identity_entity_alias" "nghuytan_userpass" {
+  name           = "nghuytan"
+  mount_accessor = data.vault_auth_backend.userpass.accessor
+  canonical_id   = vault_identity_entity.nghuytan.id
+}
+
+resource "vault_identity_entity_alias" "lucastran05_userpass" {
+  name           = "lucastran05"
+  mount_accessor = data.vault_auth_backend.userpass.accessor
+  canonical_id   = vault_identity_entity.lucastran05.id
+}
+
+
 
