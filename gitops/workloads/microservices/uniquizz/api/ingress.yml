@@ -1,0 +1,26 @@
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: uniquizz-strip-prefix
+spec:
+  stripPrefix:
+    prefixes:
+      - /uniquizz
+
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: uniquizz-api-ingress
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`api.nooblearn2code.com`) && PathPrefix(`/uniquizz`)
+      kind: Rule
+      middlewares:
+        - name: uniquizz-strip-prefix
+      services:
+        - name: uniquizz-api-svc
+          port: 80

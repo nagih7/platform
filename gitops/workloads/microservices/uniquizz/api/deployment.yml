@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: uniquizz-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: uniquizz-api
+  template:
+    metadata:
+      labels:
+        app: uniquizz-api
+    spec:
+      containers:
+        - name: app
+          image: nooblearn2code/uniquizz-api:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+          envFrom:
+            - secretRef:
+                name: uniquizz-api-secret
+            - configMapRef:
+                name: uniquizz-api-config
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "64Mi"
+            limits:
+              cpu: "250m"
+              memory: "256Mi"
