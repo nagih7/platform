@@ -1,6 +1,6 @@
 variables:
   VAULT_ADDR: "http://hashicorp-vault.vault.svc.cluster.local:8200"
-  GITOPS_PATH: "gitops/workloads/microservices"
+  GITOPS_PATH: "gitops/workloads"
 
 .update_gitops_template:
   stage: deploy
