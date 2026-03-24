@@ -13,4 +13,4 @@ commonLabels:
 images:
 - name: nooblearn2code/workflows
   newName: nooblearn2code/workflows
-  newTag: d83dc5b8
+  newTag: 6067fc05
