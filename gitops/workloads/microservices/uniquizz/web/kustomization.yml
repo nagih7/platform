@@ -14,4 +14,4 @@ commonLabels:
 images:
 - name: nooblearn2code/uniquizz-web
   newName: nooblearn2code/uniquizz-web
-  newTag: cb2a8bd0
+  newTag: 41ce87bd
