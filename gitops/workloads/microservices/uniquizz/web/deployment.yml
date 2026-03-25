@@ -17,7 +17,7 @@ spec:
           image: nooblearn2code/uniquizz-web:latest
           imagePullPolicy: Always
           ports:
-            - containerPort: 3000
+            - containerPort: 4173
           envFrom:
             - secretRef:
                 name: uniquizz-web-secret
