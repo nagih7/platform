@@ -1,17 +1,17 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - configmap.yml
-  - deployment.yml
-  - service.yml
-  - ingress.yml
-  - external-secret.yml
+- configmap.yml
+- deployment.yml
+- service.yml
+- ingress.yml
+- external-secret.yml
 
 commonLabels:
   app: uniquizz-web
   tier: frontend
 
 images:
-  - name: nooblearn2code/uniquizz-web
-    newName: nooblearn2code/uniquizz-web
-    newTag: latest
+- name: nooblearn2code/uniquizz-web
+  newName: nooblearn2code/uniquizz-web
+  newTag: cb2a8bd0
