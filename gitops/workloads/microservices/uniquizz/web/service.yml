@@ -7,4 +7,4 @@ spec:
     app: resumind
   ports:
     - port: 80
-      targetPort: 4173
+      targetPort: 5173
