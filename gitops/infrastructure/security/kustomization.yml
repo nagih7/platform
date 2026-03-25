@@ -3,6 +3,7 @@ kind: Kustomization
 
 resources:
   - namespace.yml
+  - argocd
   - vault
   - external-secret
   - cert-manager
