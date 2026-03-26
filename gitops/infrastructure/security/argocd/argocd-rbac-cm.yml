@@ -4,20 +4,18 @@ metadata:
   name: argocd-rbac-cm
   namespace: argocd
 data:
-  policy.default: role:readonly # Default role for all users
   policy.csv: |
-    # Admin group - full access
     p, role:admin, applications, *, */*, allow
     p, role:admin, clusters, *, *, allow
     p, role:admin, repositories, *, *, allow
 
-    # Developer role - sync only
-    p, role:developer, applications, get, */*, allow
-    p, role:developer, applications, sync, */*, allow
-    p, role:developer, applications, create, */*, allow
+    p, role:developer, applications, get, workloads/*, allow
+    p, role:developer, applications, sync, workloads/*, allow
+    p, role:developer, applications, update, workloads/*, allow
+    p, role:developer, applications, action/*, workloads/*, allow
 
-    # Assign users to roles
     g, nagih, role:admin
     g, hoanggxyuuki, role:developer
     g, nghuytan, role:developer
     g, lucastran05, role:developer
+  policy.default: role:readonly

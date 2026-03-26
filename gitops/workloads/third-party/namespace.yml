@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: third-party
+  labels:
+    name: third-party
+    managed-by: argocd

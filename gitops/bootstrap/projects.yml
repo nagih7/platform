@@ -1,0 +1,72 @@
+# Infrastructure Project - nagih only
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: infrastructure
+  namespace: argocd
+spec:
+  description: "Infrastructure layer - admin only"
+  sourceRepos:
+    - "https://github.com/nagih7/platform.git"
+  destinations:
+    - namespace: "*"
+      server: "https://kubernetes.default.svc"
+  clusterResourceWhitelist:
+    - group: "*"
+      kind: "*"
+
+---
+# Platform Project
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: platform
+  namespace: argocd
+spec:
+  description: "Platform layer - databases, tooling"
+  sourceRepos:
+    - "https://github.com/nagih7/platform.git"
+  destinations:
+    - namespace: "argocd"
+      server: "https://kubernetes.default.svc"
+    - namespace: "databases"
+      server: "https://kubernetes.default.svc"
+    - namespace: "tooling"
+      server: "https://kubernetes.default.svc"
+    - namespace: "gitlab"
+      server: "https://kubernetes.default.svc"
+  clusterResourceWhitelist:
+    - group: "*"
+      kind: "*"
+
+---
+# Workloads Project - developers access here
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: workloads
+  namespace: argocd
+spec:
+  description: "Workloads layer - microservices, apps"
+  sourceRepos:
+    - "https://github.com/nagih7/platform.git"
+  destinations:
+    - namespace: "microservices"
+      server: "https://kubernetes.default.svc"
+    - namespace: "static-apps"
+      server: "https://kubernetes.default.svc"
+    - namespace: "third-party"
+      server: "https://kubernetes.default.svc"
+    - namespace: "vaultwarden"
+      server: "https://kubernetes.default.svc"
+    - namespace: "seafile"
+      server: "https://kubernetes.default.svc"
+    - namespace: "standalone"
+      server: "https://kubernetes.default.svc"
+    - namespace: "discord-bots"
+      server: "https://kubernetes.default.svc"
+  clusterResourceWhitelist:
+    - group: "apps"
+      kind: "*"
+    - group: ""
+      kind: "*"
