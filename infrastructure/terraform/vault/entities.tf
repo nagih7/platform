@@ -23,3 +23,9 @@ resource "vault_identity_entity" "lucastran05" {
   metadata = { email = "trancuong13112005@gmail.com" }
 }
 
+resource "vault_identity_entity" "kkevin" {
+  name     = "kkevin"
+  policies = []
+  metadata = { email = "khoipn.kkevin@gmail.com" }
+}
+

@@ -14,8 +14,14 @@ data:
     p, role:developer, applications, update, workloads/*, allow
     p, role:developer, applications, action/*, workloads/*, allow
 
+    p, role:viewer, applications, get, */*, allow
+    p, role:viewer, clusters, get, *, allow
+    p, role:viewer, repositories, get, *, allow
+    p, role:viewer, projects, get, *, allow
+
     g, nagih, role:admin
     g, hoanggxyuuki, role:developer
     g, nghuytan, role:developer
     g, lucastran05, role:developer
+    g, kkevin, role:viewer
   policy.default: role:readonly

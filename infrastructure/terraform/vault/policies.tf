@@ -19,6 +19,28 @@ resource "vault_policy" "admin" {
   EOT
 }
 
+# ── DevOps Policies ───────────────────────────────────────────
+resource "vault_policy" "devops" {
+  name = "devops-policy"
+
+  policy = <<-EOT
+    path "workloads*" {
+      capabilities = ["create","read", "update", "delete", "list"]
+    }
+  EOT
+}
+
+# ── Viewer Policies ───────────────────────────────────────────
+resource "vault_policy" "viewer" {
+  name = "viewer-policy"
+
+  policy = <<-EOT
+    path "workloads*" {
+      capabilities = ["read", "list"]
+    }
+  EOT
+}
+
 # ── CI Policies ───────────────────────────────────────────
 resource "vault_policy" "ci_build" {
   name = "ci-build-policy"

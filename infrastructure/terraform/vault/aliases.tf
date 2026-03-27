@@ -26,5 +26,10 @@ resource "vault_identity_entity_alias" "lucastran05_userpass" {
   canonical_id   = vault_identity_entity.lucastran05.id
 }
 
+resource "vault_identity_entity_alias" "kkevin_userpass" {
+  name           = "kkevin"
+  mount_accessor = data.vault_auth_backend.userpass.accessor
+  canonical_id   = vault_identity_entity.kkevin.id
+}
 
 

@@ -8,7 +8,21 @@ resource "vault_identity_group" "admin" {
   ]
 
   metadata = {
-    description = "Homelab administrators"
+    description = "homelab administrators"
+  }
+}
+
+resource "vault_identity_group" "viewer" {
+  name     = "viewer"
+  type     = "internal"
+  policies = [vault_policy.viewer.name]
+
+  member_entity_ids = [
+    vault_identity_entity.kkevin.id
+  ]
+
+  metadata = {
+    description = "DevOps Engineer"
   }
 }
 
